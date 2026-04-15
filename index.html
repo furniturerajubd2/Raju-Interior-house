@@ -174,7 +174,7 @@ let dashboardExpenseStatusFilter = "all";
 let dashboardDateFrom = "";
 let dashboardDateTo = "";
 let appUnlocked = !((DB.settings && DB.settings.appPassword) || "");
-let sensitivePageUnlocked = { personal: false, dashboard: false };
+let menuPageUnlocked = { invoice: false, challan: false, receipt: false, supplier: false, expense: false, personal: false, dashboard: false };
 
 function setCloudSyncStatus(message, shouldRender) {
   cloudSyncStatus = message;
@@ -216,6 +216,22 @@ function normalizeLoadedDB(data) {
   next.supplierProjects = Array.isArray(next.supplierProjects) ? next.supplierProjects : [];
   next.personalCash = Array.isArray(next.personalCash) ? next.personalCash : [];
   return next;
+}
+function pageLabel(page) {
+  return ({ invoice: "Invoice", challan: "Challan", receipt: "Money Receipt", supplier: "Supplier", expense: "Expense", personal: "Personal Cash", dashboard: "Dashboard" })[page] || "Page";
+}
+function menuPasswordKey(page) {
+  return ({ invoice: "invoicePassword", challan: "challanPassword", receipt: "receiptPassword", supplier: "supplierPassword", expense: "expensePassword", personal: "personalPassword", dashboard: "dashboardPassword" })[page] || "";
+}
+function getMenuPassword(page) {
+  const key = menuPasswordKey(page);
+  return key ? String((DB.settings || {})[key] || "") : "";
+}
+function isMenuLocked(page) {
+  return !!getMenuPassword(page) && !menuPageUnlocked[page];
+}
+function resetMenuLocks() {
+  menuPageUnlocked = { invoice: false, challan: false, receipt: false, supplier: false, expense: false, personal: false, dashboard: false };
 }
 async function restoreCloudBackup() {
   if(!supabaseClient) return;
@@ -692,7 +708,7 @@ function resetAll() {
   if(confirm("This will clear all local data in this browser. Continue?")) {
     DB = freshDB(); localStorage.removeItem(KEY); saveDB();
     appUnlocked = true;
-    sensitivePageUnlocked = { personal: false, dashboard: false };
+    resetMenuLocks();
   }
 }
 
@@ -2083,7 +2099,7 @@ function saveSettings() {
     }
     DB.settings.appPassword = "";
     appUnlocked = true;
-    sensitivePageUnlocked = { personal: false, dashboard: false };
+    resetMenuLocks();
   } else if(newPassword || confirmPassword) {
     if(hasExistingPassword && currentPassword !== DB.settings.appPassword) {
       alert("Current password not correct");
@@ -2099,8 +2115,16 @@ function saveSettings() {
     }
     DB.settings.appPassword = newPassword;
     appUnlocked = true;
-    sensitivePageUnlocked = { personal: false, dashboard: false };
+    resetMenuLocks();
   }
+  DB.settings.invoicePassword = (document.getElementById("setInvoicePassword").value || "").trim();
+  DB.settings.challanPassword = (document.getElementById("setChallanPassword").value || "").trim();
+  DB.settings.receiptPassword = (document.getElementById("setReceiptPassword").value || "").trim();
+  DB.settings.supplierPassword = (document.getElementById("setSupplierPassword").value || "").trim();
+  DB.settings.expensePassword = (document.getElementById("setExpensePassword").value || "").trim();
+  DB.settings.personalPassword = (document.getElementById("setPersonalPassword").value || "").trim();
+  DB.settings.dashboardPassword = (document.getElementById("setDashboardPassword").value || "").trim();
+  resetMenuLocks();
   currentPage = DB.settings.defaultPage;
   saveDB();
   alert("Settings saved");
@@ -2126,7 +2150,7 @@ function logout() {
   headerMenuOpen = false;
   currentPage = "invoice";
   appUnlocked = !((DB.settings && DB.settings.appPassword) || "");
-  sensitivePageUnlocked = { personal: false, dashboard: false };
+  resetMenuLocks();
   render();
 }
 function unlockApp() {
@@ -2142,8 +2166,8 @@ function unlockApp() {
 function unlockSensitivePage() {
   const input = document.getElementById("sectionPassword");
   const password = input ? input.value : "";
-  if(password === (DB.settings.appPassword || "")) {
-    sensitivePageUnlocked[currentPage] = true;
+  if(password === getMenuPassword(currentPage)) {
+    menuPageUnlocked[currentPage] = true;
     render();
     return;
   }
@@ -2153,7 +2177,7 @@ function loginPage() {
   return '<div class="wrap"><div class="login"><h2 style="margin-top:0">Enter Password</h2><p class="small" style="margin-bottom:14px">This app is locked. Password diye open korte hobe.</p><label>Password</label><input id="loginPassword" type="password" placeholder="Enter password" onkeydown="if(event.key===\'Enter\') unlockApp()"><div class="actions" style="margin-top:14px"><button onclick="unlockApp()">Unlock</button></div></div></div>';
 }
 function sensitivePageLockView() {
-  const label = currentPage === "dashboard" ? "Dashboard" : "Personal Cash";
+  const label = pageLabel(currentPage);
   return '<div class="wrap"><div class="login"><h2 style="margin-top:0">'+label+' Locked</h2><p class="small" style="margin-bottom:14px">Ei section open korte app password abar dite hobe.</p><label>Password</label><input id="sectionPassword" type="password" placeholder="Enter password" onkeydown="if(event.key===\'Enter\') unlockSensitivePage()"><div class="actions" style="margin-top:14px"><button onclick="unlockSensitivePage()">Unlock '+label+'</button><button class="secondary small" onclick="setPage(\'invoice\')">Back</button></div></div></div>';
 }
 
@@ -2246,11 +2270,11 @@ function dashboardPage() {
   return '<div class="grid"><div class="card span-12"><div class="section-title"><h2>Dashboard</h2><span class="pill">'+esc(activeDateLabel)+'</span></div><div class="row"><div><label>Date From</label><input type="date" value="'+esc(dashboardDateFrom)+'" onchange="setDashboardDate(\'from\', this.value)"></div><div><label>Date To</label><input type="date" value="'+esc(dashboardDateTo)+'" onchange="setDashboardDate(\'to\', this.value)"></div></div><div class="actions" style="margin-top:12px"><button class="secondary small" onclick="setDashboardDatePreset(\'thisMonth\')">This Month</button><button class="secondary small" onclick="setDashboardDatePreset(\'all\')">All Dates</button></div><div class="note">Date filter dashboard summary ar list duitar upor kaj korbe.</div></div><div class="card span-12"><div class="section-title"><h2>Sales & Summary</h2><span class="pill">'+esc(activeDateLabel)+'</span></div><div class="stats dashboardStats"><div class="stat"><div class="small">This Month Sale</div><div class="v">'+money(t.currentMonthSale)+'</div></div><div class="stat"><div class="small">Filtered Sale</div><div class="v">'+money(t.totalSale)+'</div></div><div class="stat"><div class="small">General Expense</div><div class="v">'+money(t.generalExpense)+'</div></div><div class="stat"><div class="small">Supplier Expense</div><div class="v">'+money(t.supplierExpense)+'</div></div><div class="stat"><div class="small">Filtered Profit</div><div class="v">'+money(t.monthlyProfit)+'</div></div></div></div><div class="card span-12"><div class="section-title"><div class="actions"><h2 style="margin:0">'+listTitle+'</h2><button class="secondary small '+(dashboardTab==="customer"?"active":"")+'" onclick="setDashboardTab(\'customer\')">Customer List</button><button class="secondary small '+(dashboardTab==="supplier"?"active":"")+'" onclick="setDashboardTab(\'supplier\')">Supplier List</button><button class="secondary small '+(dashboardTab==="expense"?"active":"")+'" onclick="setDashboardTab(\'expense\')">Expense List</button></div><span class="pill">'+listBadge+'</span></div>'+listBody+'</div></div>';
 }
 function settingsPage() {
-  return '<div class="card"><h2>Settings</h2><div class="small" style="margin:-4px 0 14px;color:var(--gold2)">Cloud Backup: '+esc(cloudSyncStatus)+'</div><div class="row"><div><label>Business Name</label><input id="setName" value="'+esc(DB.settings.name)+'"></div><div><label>Phone</label><input id="setPhone" value="'+esc(DB.settings.phone)+'"></div></div><label>Address</label><input id="setAddress" value="'+esc(DB.settings.address)+'"><div class="row"><div><label>Currency</label><input id="setCurrency" value="'+esc(DB.settings.currency || "৳")+'"></div><div><label>Logo URL</label><input id="setLogo" placeholder="Optional online logo url"></div></div><div class="row"><div><label>Invoice Prefix</label><input id="setInvoicePrefix" value="'+esc(DB.settings.invoicePrefix || "INV")+'"></div><div><label>Challan Prefix</label><input id="setChallanPrefix" value="'+esc(DB.settings.challanPrefix || "CHL")+'"></div><div><label>Receipt Prefix</label><input id="setReceiptPrefix" value="'+esc(DB.settings.receiptPrefix || "MR")+'"></div><div><label>Supplier Prefix</label><input id="setSupplierPrefix" value="'+esc(DB.settings.supplierPrefix || "SUP")+'"></div></div><label>Default Open Page</label><input id="setDefaultPage" value="'+esc(DB.settings.defaultPage || "invoice")+'" placeholder="invoice / challan / receipt / supplier / expense / personal / dashboard / settings"><label><input id="setShowLogo" type="checkbox" style="width:auto;margin-right:8px" '+(DB.settings.showLogo?'checked':'')+'> Show Logo in Print</label><div style="margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:16px"><h3 style="margin:0 0 10px">App Password</h3><div class="small" style="margin-bottom:10px">'+(DB.settings.appPassword ? 'Password already set. Change or remove korte current password lagbe.' : 'Password set korle app open korar age lock screen ashbe.')+'</div><div class="small" style="margin-bottom:10px;color:var(--muted)">Same password diye Personal Cash আর Dashboard section-o lock thakbe.</div>'+(DB.settings.appPassword ? '<label>Current Password</label><input id="setCurrentPassword" type="password" placeholder="Current password" onkeydown="if(event.key===\'Enter\') saveSettings()">' : '')+'<div class="row"><div><label>New Password</label><input id="setNewPassword" type="password" placeholder="Minimum 4 characters" onkeydown="if(event.key===\'Enter\') saveSettings()"></div><div><label>Confirm Password</label><input id="setConfirmPassword" type="password" placeholder="Retype password" onkeydown="if(event.key===\'Enter\') saveSettings()"></div></div>'+(DB.settings.appPassword ? '<label><input id="setRemovePassword" type="checkbox" style="width:auto;margin-right:8px"> Remove password lock</label>' : '')+'</div><div class="actions"><button onclick="saveSettings()">Save Settings</button><button class="secondary small" onclick="pushCloudBackup()">Sync Now</button><button class="secondary small" onclick="exportBackup()">Backup Export</button><button class="secondary small" onclick="document.getElementById(\'backupFile2\').click()">Import</button><input id="backupFile2" type="file" accept=".json" class="hide" onchange="importBackup(event)"><button class="danger small" onclick="resetAll()">Reset App</button></div></div>';
+  return '<div class="card"><h2>Settings</h2><div class="small" style="margin:-4px 0 14px;color:var(--gold2)">Cloud Backup: '+esc(cloudSyncStatus)+'</div><div class="row"><div><label>Business Name</label><input id="setName" value="'+esc(DB.settings.name)+'"></div><div><label>Phone</label><input id="setPhone" value="'+esc(DB.settings.phone)+'"></div></div><label>Address</label><input id="setAddress" value="'+esc(DB.settings.address)+'"><div class="row"><div><label>Currency</label><input id="setCurrency" value="'+esc(DB.settings.currency || "৳")+'"></div><div><label>Logo URL</label><input id="setLogo" placeholder="Optional online logo url"></div></div><div class="row"><div><label>Invoice Prefix</label><input id="setInvoicePrefix" value="'+esc(DB.settings.invoicePrefix || "INV")+'"></div><div><label>Challan Prefix</label><input id="setChallanPrefix" value="'+esc(DB.settings.challanPrefix || "CHL")+'"></div><div><label>Receipt Prefix</label><input id="setReceiptPrefix" value="'+esc(DB.settings.receiptPrefix || "MR")+'"></div><div><label>Supplier Prefix</label><input id="setSupplierPrefix" value="'+esc(DB.settings.supplierPrefix || "SUP")+'"></div></div><label>Default Open Page</label><input id="setDefaultPage" value="'+esc(DB.settings.defaultPage || "invoice")+'" placeholder="invoice / challan / receipt / supplier / expense / personal / dashboard / settings"><label><input id="setShowLogo" type="checkbox" style="width:auto;margin-right:8px" '+(DB.settings.showLogo?'checked':'')+'> Show Logo in Print</label><div style="margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:16px"><h3 style="margin:0 0 10px">App Password</h3><div class="small" style="margin-bottom:10px">'+(DB.settings.appPassword ? 'Password already set. Change or remove korte current password lagbe.' : 'Password set korle app open korar age lock screen ashbe.')+'</div>'+(DB.settings.appPassword ? '<label>Current Password</label><input id="setCurrentPassword" type="password" placeholder="Current password" onkeydown="if(event.key===\'Enter\') saveSettings()">' : '')+'<div class="row"><div><label>New Password</label><input id="setNewPassword" type="password" placeholder="Minimum 4 characters" onkeydown="if(event.key===\'Enter\') saveSettings()"></div><div><label>Confirm Password</label><input id="setConfirmPassword" type="password" placeholder="Retype password" onkeydown="if(event.key===\'Enter\') saveSettings()"></div></div>'+(DB.settings.appPassword ? '<label><input id="setRemovePassword" type="checkbox" style="width:auto;margin-right:8px"> Remove password lock</label>' : '')+'</div><div style="margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:16px"><h3 style="margin:0 0 10px">Menu Passwords</h3><div class="small" style="margin-bottom:10px;color:var(--muted)">Jei menu-te password diben, oi menu open korte oi alada password lagbe. Blank thakle lock hobe na.</div><div class="row"><div><label>Invoice Password</label><input id="setInvoicePassword" type="password" value="'+esc(DB.settings.invoicePassword || "")+'" onkeydown="if(event.key===\'Enter\') saveSettings()"></div><div><label>Challan Password</label><input id="setChallanPassword" type="password" value="'+esc(DB.settings.challanPassword || "")+'" onkeydown="if(event.key===\'Enter\') saveSettings()"></div></div><div class="row"><div><label>Receipt Password</label><input id="setReceiptPassword" type="password" value="'+esc(DB.settings.receiptPassword || "")+'" onkeydown="if(event.key===\'Enter\') saveSettings()"></div><div><label>Supplier Password</label><input id="setSupplierPassword" type="password" value="'+esc(DB.settings.supplierPassword || "")+'" onkeydown="if(event.key===\'Enter\') saveSettings()"></div></div><div class="row"><div><label>Expense Password</label><input id="setExpensePassword" type="password" value="'+esc(DB.settings.expensePassword || "")+'" onkeydown="if(event.key===\'Enter\') saveSettings()"></div><div><label>Personal Cash Password</label><input id="setPersonalPassword" type="password" value="'+esc(DB.settings.personalPassword || "")+'" onkeydown="if(event.key===\'Enter\') saveSettings()"></div></div><div class="row"><div><label>Dashboard Password</label><input id="setDashboardPassword" type="password" value="'+esc(DB.settings.dashboardPassword || "")+'" onkeydown="if(event.key===\'Enter\') saveSettings()"></div><div></div></div></div><div class="actions"><button onclick="saveSettings()">Save Settings</button><button class="secondary small" onclick="pushCloudBackup()">Sync Now</button><button class="secondary small" onclick="exportBackup()">Backup Export</button><button class="secondary small" onclick="document.getElementById(\'backupFile2\').click()">Import</button><input id="backupFile2" type="file" accept=".json" class="hide" onchange="importBackup(event)"><button class="danger small" onclick="resetAll()">Reset App</button></div></div>';
 }
 function mainView() {
   if((DB.settings.appPassword || "") && !appUnlocked) return loginPage();
-  if((DB.settings.appPassword || "") && (currentPage === "personal" || currentPage === "dashboard") && !sensitivePageUnlocked[currentPage]) return sensitivePageLockView();
+  if(currentPage !== "settings" && isMenuLocked(currentPage)) return sensitivePageLockView();
   let content = '';
   if(currentPage === "invoice") content = invoicePage();
   else if(currentPage === "challan") content = challanPage();
