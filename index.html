@@ -103,6 +103,7 @@ th,td{border-bottom:1px solid rgba(255,255,255,.08);padding:10px 8px;text-align:
 @media (max-width:620px){.menuLauncherHead{flex-direction:column;align-items:flex-start}.menuLauncherGrid{grid-template-columns:1fr}.menuCard{min-height:auto}}
 .green{color:#7edc81} .red{color:#ff9e9e}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -123,6 +124,12 @@ const DEFAULTS = {
   defaultPage: "invoice"
 };
 const KEY = "rih_manager_menu_v4";
+const SUPABASE_URL = "https://jvhotkfoerydonrzdbkt.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2aG90a2ZvZXJ5ZG9ucnpkYmt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMjEwMjgsImV4cCI6MjA5MTc5NzAyOH0.brPaQq87RiscMx462RvFpXQht8jbr3Ya1gnz453RflE";
+const CLOUD_BACKUP_KEY = "rih_manager_menu_v4_primary";
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let cloudSyncStatus = supabaseClient ? "Cloud backup connecting..." : "Cloud backup unavailable";
+let cloudSyncTimer = null;
 
 function freshDB() {
   return {
@@ -166,8 +173,75 @@ let dashboardSupplierStatusFilter = "all";
 let dashboardExpenseStatusFilter = "all";
 let dashboardDateFrom = "";
 let dashboardDateTo = "";
+let appUnlocked = !((DB.settings && DB.settings.appPassword) || "");
+let sensitivePageUnlocked = { personal: false, dashboard: false };
 
-function saveDB() { localStorage.setItem(KEY, JSON.stringify(DB)); render(); }
+function setCloudSyncStatus(message, shouldRender) {
+  cloudSyncStatus = message;
+  if(shouldRender) render();
+}
+async function pushCloudBackup() {
+  if(!supabaseClient) return;
+  try {
+    setCloudSyncStatus("Cloud backup syncing...", currentPage === "settings");
+    const payload = JSON.parse(JSON.stringify(DB));
+    const { error } = await supabaseClient
+      .from("app_backups")
+      .upsert({
+        app_key: CLOUD_BACKUP_KEY,
+        payload: payload,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "app_key" });
+    if(error) throw error;
+    setCloudSyncStatus("Cloud backup synced", currentPage === "settings");
+  } catch (error) {
+    console.error("Cloud backup failed", error);
+    setCloudSyncStatus("Cloud backup failed", currentPage === "settings");
+  }
+}
+function queueCloudBackup() {
+  if(!supabaseClient) return;
+  if(cloudSyncTimer) clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(function() {
+    pushCloudBackup();
+  }, 600);
+}
+function normalizeLoadedDB(data) {
+  const next = data || freshDB();
+  next.settings = Object.assign({}, DEFAULTS, next.settings || {});
+  next.challans = Array.isArray(next.challans) ? next.challans : [];
+  next.sales = Array.isArray(next.sales) ? next.sales : [];
+  next.receipts = Array.isArray(next.receipts) ? next.receipts : [];
+  next.expenses = Array.isArray(next.expenses) ? next.expenses : [];
+  next.supplierProjects = Array.isArray(next.supplierProjects) ? next.supplierProjects : [];
+  next.personalCash = Array.isArray(next.personalCash) ? next.personalCash : [];
+  return next;
+}
+async function restoreCloudBackup() {
+  if(!supabaseClient) return;
+  try {
+    setCloudSyncStatus("Checking cloud backup...", false);
+    const { data, error } = await supabaseClient
+      .from("app_backups")
+      .select("payload, updated_at")
+      .eq("app_key", CLOUD_BACKUP_KEY)
+      .maybeSingle();
+    if(error) throw error;
+    if(data && data.payload) {
+      DB = normalizeLoadedDB(data.payload);
+      localStorage.setItem(KEY, JSON.stringify(DB));
+      currentPage = (DB.settings && DB.settings.defaultPage) || "invoice";
+      setCloudSyncStatus("Cloud backup restored", false);
+      render();
+      return;
+    }
+    setCloudSyncStatus("No cloud backup yet", false);
+  } catch (error) {
+    console.error("Cloud restore failed", error);
+    setCloudSyncStatus("Cloud restore failed", false);
+  }
+}
+function saveDB() { localStorage.setItem(KEY, JSON.stringify(DB)); queueCloudBackup(); render(); }
 function esc(s) { return String(s || "").replace(/[&<>"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])); }
 function money(n) { return (DB.settings.currency || "৳") + Number(n || 0).toLocaleString(); }
 function today() { return new Date().toISOString().slice(0,10); }
@@ -617,6 +691,8 @@ function brandHead() {
 function resetAll() {
   if(confirm("This will clear all local data in this browser. Continue?")) {
     DB = freshDB(); localStorage.removeItem(KEY); saveDB();
+    appUnlocked = true;
+    sensitivePageUnlocked = { personal: false, dashboard: false };
   }
 }
 
@@ -1991,6 +2067,40 @@ function saveSettings() {
   DB.settings.logo = document.getElementById("setLogo").value.trim() || DEFAULTS.logo;
   DB.settings.showLogo = document.getElementById("setShowLogo").checked;
   DB.settings.defaultPage = document.getElementById("setDefaultPage").value || "invoice";
+  const hasExistingPassword = !!(DB.settings.appPassword || "");
+  const currentPasswordInput = document.getElementById("setCurrentPassword");
+  const newPasswordInput = document.getElementById("setNewPassword");
+  const confirmPasswordInput = document.getElementById("setConfirmPassword");
+  const removePasswordInput = document.getElementById("setRemovePassword");
+  const currentPassword = currentPasswordInput ? currentPasswordInput.value : "";
+  const newPassword = newPasswordInput ? newPasswordInput.value : "";
+  const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : "";
+  const removePassword = !!(removePasswordInput && removePasswordInput.checked);
+  if(removePassword) {
+    if(hasExistingPassword && currentPassword !== DB.settings.appPassword) {
+      alert("Current password not correct");
+      return;
+    }
+    DB.settings.appPassword = "";
+    appUnlocked = true;
+    sensitivePageUnlocked = { personal: false, dashboard: false };
+  } else if(newPassword || confirmPassword) {
+    if(hasExistingPassword && currentPassword !== DB.settings.appPassword) {
+      alert("Current password not correct");
+      return;
+    }
+    if(newPassword.length < 4) {
+      alert("Password minimum 4 characters");
+      return;
+    }
+    if(newPassword !== confirmPassword) {
+      alert("New password and confirm password do not match");
+      return;
+    }
+    DB.settings.appPassword = newPassword;
+    appUnlocked = true;
+    sensitivePageUnlocked = { personal: false, dashboard: false };
+  }
   currentPage = DB.settings.defaultPage;
   saveDB();
   alert("Settings saved");
@@ -2003,16 +2113,10 @@ function importBackup(ev) {
   const file = ev.target.files[0]; if(!file) return;
   const fr = new FileReader();
   fr.onload = function() {
-    DB = JSON.parse(fr.result);
-    DB.settings = Object.assign({}, DEFAULTS, DB.settings || {});
-    DB.challans = Array.isArray(DB.challans) ? DB.challans : [];
-    DB.sales = Array.isArray(DB.sales) ? DB.sales : [];
-    DB.receipts = Array.isArray(DB.receipts) ? DB.receipts : [];
-    DB.expenses = Array.isArray(DB.expenses) ? DB.expenses : [];
-    DB.supplierProjects = Array.isArray(DB.supplierProjects) ? DB.supplierProjects : [];
-    DB.personalCash = Array.isArray(DB.personalCash) ? DB.personalCash : [];
+    DB = normalizeLoadedDB(JSON.parse(fr.result));
     localStorage.setItem(KEY, JSON.stringify(DB));
     currentPage = (DB.settings && DB.settings.defaultPage) || "invoice";
+    queueCloudBackup();
     render();
     alert("Backup imported");
   };
@@ -2021,7 +2125,36 @@ function importBackup(ev) {
 function logout() {
   headerMenuOpen = false;
   currentPage = "invoice";
+  appUnlocked = !((DB.settings && DB.settings.appPassword) || "");
+  sensitivePageUnlocked = { personal: false, dashboard: false };
   render();
+}
+function unlockApp() {
+  const input = document.getElementById("loginPassword");
+  const password = input ? input.value : "";
+  if(password === (DB.settings.appPassword || "")) {
+    appUnlocked = true;
+    render();
+    return;
+  }
+  alert("Password not correct");
+}
+function unlockSensitivePage() {
+  const input = document.getElementById("sectionPassword");
+  const password = input ? input.value : "";
+  if(password === (DB.settings.appPassword || "")) {
+    sensitivePageUnlocked[currentPage] = true;
+    render();
+    return;
+  }
+  alert("Password not correct");
+}
+function loginPage() {
+  return '<div class="wrap"><div class="login"><h2 style="margin-top:0">Enter Password</h2><p class="small" style="margin-bottom:14px">This app is locked. Password diye open korte hobe.</p><label>Password</label><input id="loginPassword" type="password" placeholder="Enter password" onkeydown="if(event.key===\'Enter\') unlockApp()"><div class="actions" style="margin-top:14px"><button onclick="unlockApp()">Unlock</button></div></div></div>';
+}
+function sensitivePageLockView() {
+  const label = currentPage === "dashboard" ? "Dashboard" : "Personal Cash";
+  return '<div class="wrap"><div class="login"><h2 style="margin-top:0">'+label+' Locked</h2><p class="small" style="margin-bottom:14px">Ei section open korte app password abar dite hobe.</p><label>Password</label><input id="sectionPassword" type="password" placeholder="Enter password" onkeydown="if(event.key===\'Enter\') unlockSensitivePage()"><div class="actions" style="margin-top:14px"><button onclick="unlockSensitivePage()">Unlock '+label+'</button><button class="secondary small" onclick="setPage(\'invoice\')">Back</button></div></div></div>';
 }
 
 function menuButton(key, label) {
@@ -2113,9 +2246,11 @@ function dashboardPage() {
   return '<div class="grid"><div class="card span-12"><div class="section-title"><h2>Dashboard</h2><span class="pill">'+esc(activeDateLabel)+'</span></div><div class="row"><div><label>Date From</label><input type="date" value="'+esc(dashboardDateFrom)+'" onchange="setDashboardDate(\'from\', this.value)"></div><div><label>Date To</label><input type="date" value="'+esc(dashboardDateTo)+'" onchange="setDashboardDate(\'to\', this.value)"></div></div><div class="actions" style="margin-top:12px"><button class="secondary small" onclick="setDashboardDatePreset(\'thisMonth\')">This Month</button><button class="secondary small" onclick="setDashboardDatePreset(\'all\')">All Dates</button></div><div class="note">Date filter dashboard summary ar list duitar upor kaj korbe.</div></div><div class="card span-12"><div class="section-title"><h2>Sales & Summary</h2><span class="pill">'+esc(activeDateLabel)+'</span></div><div class="stats dashboardStats"><div class="stat"><div class="small">This Month Sale</div><div class="v">'+money(t.currentMonthSale)+'</div></div><div class="stat"><div class="small">Filtered Sale</div><div class="v">'+money(t.totalSale)+'</div></div><div class="stat"><div class="small">General Expense</div><div class="v">'+money(t.generalExpense)+'</div></div><div class="stat"><div class="small">Supplier Expense</div><div class="v">'+money(t.supplierExpense)+'</div></div><div class="stat"><div class="small">Filtered Profit</div><div class="v">'+money(t.monthlyProfit)+'</div></div></div></div><div class="card span-12"><div class="section-title"><div class="actions"><h2 style="margin:0">'+listTitle+'</h2><button class="secondary small '+(dashboardTab==="customer"?"active":"")+'" onclick="setDashboardTab(\'customer\')">Customer List</button><button class="secondary small '+(dashboardTab==="supplier"?"active":"")+'" onclick="setDashboardTab(\'supplier\')">Supplier List</button><button class="secondary small '+(dashboardTab==="expense"?"active":"")+'" onclick="setDashboardTab(\'expense\')">Expense List</button></div><span class="pill">'+listBadge+'</span></div>'+listBody+'</div></div>';
 }
 function settingsPage() {
-  return '<div class="card"><h2>Settings</h2><div class="row"><div><label>Business Name</label><input id="setName" value="'+esc(DB.settings.name)+'"></div><div><label>Phone</label><input id="setPhone" value="'+esc(DB.settings.phone)+'"></div></div><label>Address</label><input id="setAddress" value="'+esc(DB.settings.address)+'"><div class="row"><div><label>Currency</label><input id="setCurrency" value="'+esc(DB.settings.currency || "৳")+'"></div><div><label>Logo URL</label><input id="setLogo" placeholder="Optional online logo url"></div></div><div class="row"><div><label>Invoice Prefix</label><input id="setInvoicePrefix" value="'+esc(DB.settings.invoicePrefix || "INV")+'"></div><div><label>Challan Prefix</label><input id="setChallanPrefix" value="'+esc(DB.settings.challanPrefix || "CHL")+'"></div><div><label>Receipt Prefix</label><input id="setReceiptPrefix" value="'+esc(DB.settings.receiptPrefix || "MR")+'"></div><div><label>Supplier Prefix</label><input id="setSupplierPrefix" value="'+esc(DB.settings.supplierPrefix || "SUP")+'"></div></div><label>Default Open Page</label><input id="setDefaultPage" value="'+esc(DB.settings.defaultPage || "invoice")+'" placeholder="invoice / challan / receipt / supplier / expense / personal / dashboard / settings"><label><input id="setShowLogo" type="checkbox" style="width:auto;margin-right:8px" '+(DB.settings.showLogo?'checked':'')+'> Show Logo in Print</label><div class="actions"><button onclick="saveSettings()">Save Settings</button><button class="secondary small" onclick="exportBackup()">Backup Export</button><button class="secondary small" onclick="document.getElementById(\'backupFile2\').click()">Import</button><input id="backupFile2" type="file" accept=".json" class="hide" onchange="importBackup(event)"><button class="danger small" onclick="resetAll()">Reset App</button></div></div>';
+  return '<div class="card"><h2>Settings</h2><div class="small" style="margin:-4px 0 14px;color:var(--gold2)">Cloud Backup: '+esc(cloudSyncStatus)+'</div><div class="row"><div><label>Business Name</label><input id="setName" value="'+esc(DB.settings.name)+'"></div><div><label>Phone</label><input id="setPhone" value="'+esc(DB.settings.phone)+'"></div></div><label>Address</label><input id="setAddress" value="'+esc(DB.settings.address)+'"><div class="row"><div><label>Currency</label><input id="setCurrency" value="'+esc(DB.settings.currency || "৳")+'"></div><div><label>Logo URL</label><input id="setLogo" placeholder="Optional online logo url"></div></div><div class="row"><div><label>Invoice Prefix</label><input id="setInvoicePrefix" value="'+esc(DB.settings.invoicePrefix || "INV")+'"></div><div><label>Challan Prefix</label><input id="setChallanPrefix" value="'+esc(DB.settings.challanPrefix || "CHL")+'"></div><div><label>Receipt Prefix</label><input id="setReceiptPrefix" value="'+esc(DB.settings.receiptPrefix || "MR")+'"></div><div><label>Supplier Prefix</label><input id="setSupplierPrefix" value="'+esc(DB.settings.supplierPrefix || "SUP")+'"></div></div><label>Default Open Page</label><input id="setDefaultPage" value="'+esc(DB.settings.defaultPage || "invoice")+'" placeholder="invoice / challan / receipt / supplier / expense / personal / dashboard / settings"><label><input id="setShowLogo" type="checkbox" style="width:auto;margin-right:8px" '+(DB.settings.showLogo?'checked':'')+'> Show Logo in Print</label><div style="margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:16px"><h3 style="margin:0 0 10px">App Password</h3><div class="small" style="margin-bottom:10px">'+(DB.settings.appPassword ? 'Password already set. Change or remove korte current password lagbe.' : 'Password set korle app open korar age lock screen ashbe.')+'</div><div class="small" style="margin-bottom:10px;color:var(--muted)">Same password diye Personal Cash আর Dashboard section-o lock thakbe.</div>'+(DB.settings.appPassword ? '<label>Current Password</label><input id="setCurrentPassword" type="password" placeholder="Current password" onkeydown="if(event.key===\'Enter\') saveSettings()">' : '')+'<div class="row"><div><label>New Password</label><input id="setNewPassword" type="password" placeholder="Minimum 4 characters" onkeydown="if(event.key===\'Enter\') saveSettings()"></div><div><label>Confirm Password</label><input id="setConfirmPassword" type="password" placeholder="Retype password" onkeydown="if(event.key===\'Enter\') saveSettings()"></div></div>'+(DB.settings.appPassword ? '<label><input id="setRemovePassword" type="checkbox" style="width:auto;margin-right:8px"> Remove password lock</label>' : '')+'</div><div class="actions"><button onclick="saveSettings()">Save Settings</button><button class="secondary small" onclick="pushCloudBackup()">Sync Now</button><button class="secondary small" onclick="exportBackup()">Backup Export</button><button class="secondary small" onclick="document.getElementById(\'backupFile2\').click()">Import</button><input id="backupFile2" type="file" accept=".json" class="hide" onchange="importBackup(event)"><button class="danger small" onclick="resetAll()">Reset App</button></div></div>';
 }
 function mainView() {
+  if((DB.settings.appPassword || "") && !appUnlocked) return loginPage();
+  if((DB.settings.appPassword || "") && (currentPage === "personal" || currentPage === "dashboard") && !sensitivePageUnlocked[currentPage]) return sensitivePageLockView();
   let content = '';
   if(currentPage === "invoice") content = invoicePage();
   else if(currentPage === "challan") content = challanPage();
@@ -2144,6 +2279,7 @@ function render() {
   if(currentPage === "personal") updatePersonalCashLabels();
 }
 render();
+restoreCloudBackup();
 </script>
 </body>
 </html>
