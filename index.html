@@ -1687,7 +1687,7 @@ function printReceiptEntry(id) {
 function saveExpense() {
   const id = editExpenseId || uid("EXP");
   const old = editExpenseId ? DB.expenses.find(x=>x.id===id) : null;
-  const obj = { id:id, date: document.getElementById("expDate").value || today(), head: document.getElementById("expHead").value, amount: Number(document.getElementById("expAmount").value || 0), notes: document.getElementById("expNotes").value, orderStatus: (old && old.orderStatus) || "On Going" };
+  const obj = { id:id, date: document.getElementById("expDate").value || today(), head: document.getElementById("expHead").value, personalName: (document.getElementById("expPersonalName").value || "").trim(), amount: Number(document.getElementById("expAmount").value || 0), notes: document.getElementById("expNotes").value, orderStatus: (old && old.orderStatus) || "On Going" };
   if(editExpenseId) DB.expenses = DB.expenses.map(x => x.id===id ? obj : x); else DB.expenses.unshift(obj);
   editExpenseId = null; saveDB();
 }
@@ -1697,6 +1697,7 @@ function fillExpense(id) {
   setTimeout(function() {
     document.getElementById("expDate").value = e.date || today();
     document.getElementById("expHead").value = e.head || "";
+    document.getElementById("expPersonalName").value = e.personalName || "";
     document.getElementById("expAmount").value = e.amount || 0;
     document.getElementById("expNotes").value = e.notes || "";
   }, 50);
@@ -1704,13 +1705,13 @@ function fillExpense(id) {
 function openExpense(id) {
   const e = DB.expenses.find(x=>x.id===id); if(!e) return;
   let html = '<div class="section-title"><h2>Expense Entry</h2><div class="actions"><button class="secondary small" onclick="printExpenseEntry(\''+id+'\')">Print</button><button class="secondary small" onclick="closeModal()">Close</button></div></div>';
-  html += '<div class="kv"><strong>ID</strong><div>'+esc(e.id)+'</div></div><div class="kv"><strong>Date</strong><div>'+esc(e.date)+'</div></div><div class="kv"><strong>Head</strong><div>'+esc(e.head)+'</div></div><div class="kv"><strong>Amount</strong><div>'+money(e.amount)+'</div></div><div class="kv"><strong>Notes</strong><div>'+esc(e.notes || "-")+'</div></div>';
+  html += '<div class="kv"><strong>ID</strong><div>'+esc(e.id)+'</div></div><div class="kv"><strong>Date</strong><div>'+esc(e.date)+'</div></div><div class="kv"><strong>Head</strong><div>'+esc(e.head)+'</div></div><div class="kv"><strong>Personal Expense Name</strong><div>'+esc(e.personalName || "-")+'</div></div><div class="kv"><strong>Amount</strong><div>'+money(e.amount)+'</div></div><div class="kv"><strong>Notes</strong><div>'+esc(e.notes || "-")+'</div></div>';
   openModal(html);
 }
 function printExpenseEntry(id) {
   const e = DB.expenses.find(x=>x.id===id); if(!e) return;
   let body = brandHead();
-  body += '<h1>EXPENSE ENTRY</h1><p><strong>ID:</strong> '+esc(e.id)+'</p><p><strong>Date:</strong> '+esc(e.date)+'</p><p><strong>Head:</strong> '+esc(e.head)+'</p><p><strong>Amount:</strong> '+money(e.amount)+'</p><p><strong>Notes:</strong> '+esc(e.notes || "-")+'</p>';
+  body += '<h1>EXPENSE ENTRY</h1><p><strong>ID:</strong> '+esc(e.id)+'</p><p><strong>Date:</strong> '+esc(e.date)+'</p><p><strong>Head:</strong> '+esc(e.head)+'</p><p><strong>Personal Expense Name:</strong> '+esc(e.personalName || "-")+'</p><p><strong>Amount:</strong> '+money(e.amount)+'</p><p><strong>Notes:</strong> '+esc(e.notes || "-")+'</p>';
   printHTML("Expense", body);
 }
 
@@ -2019,7 +2020,7 @@ function supplierPage() {
 function expensePage() {
   const recentVisible = isRecentVisible("expense");
   const recentCard = '<div class="card recentDock"><div class="recentDockHead"><div><h2 style="margin-bottom:4px">Recent Expense</h2><div class="small">'+DB.expenses.length+' entries</div></div><button class="secondary small" onclick="toggleRecentPanel(\'expense\')">'+(recentVisible ? 'Hide' : 'Show')+'</button></div>'+recentExpenseListView()+'</div>';
-  const formCard = '<div class="card invoiceMain"><div class="section-title"><h2>Expense</h2><div class="actions"><button class="secondary small" onclick="toggleRecentPanel(\'expense\')">'+(recentVisible ? 'Hide Recent' : 'Show Recent')+'</button></div></div><label>Date</label><input id="expDate" type="date" value="'+today()+'"><label>Expense Head</label><input id="expHead" placeholder="Transport / Rent / Salary / Tea"><label>Amount</label><input id="expAmount" type="number" value="0"><label>Notes</label><textarea id="expNotes"></textarea><button onclick="saveExpense()">'+(editExpenseId?"Update Expense":"Save Expense")+'</button><div class="note">Supplier payment dashboard e expense hisebe count hocche.</div></div>';
+  const formCard = '<div class="card invoiceMain"><div class="section-title"><h2>Expense</h2><div class="actions"><button class="secondary small" onclick="toggleRecentPanel(\'expense\')">'+(recentVisible ? 'Hide Recent' : 'Show Recent')+'</button></div></div><label>Date</label><input id="expDate" type="date" value="'+today()+'"><label>Expense Head</label><input id="expHead" placeholder="Transport / Rent / Salary / Tea"><label>Personal Expense Name</label><input id="expPersonalName" placeholder="Optional person or purpose name"><label>Amount</label><input id="expAmount" type="number" value="0"><label>Notes</label><textarea id="expNotes"></textarea><button onclick="saveExpense()">'+(editExpenseId?"Update Expense":"Save Expense")+'</button><div class="note">Supplier payment dashboard e expense hisebe count hocche.</div></div>';
   return '<div class="invoiceShell '+(recentVisible ? '' : 'recentHidden')+'">' + formCard + (recentVisible ? recentCard : '') + '</div>';
 }
 function dashboardPage() {
