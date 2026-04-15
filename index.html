@@ -1586,13 +1586,13 @@ function deletePersonalCash(id) {
 
 function saveChallan() {
   const items = collectChallanItems();
-  const invoiceId = (document.getElementById("chlInvoiceId").value || "").trim();
-  const linkedSale = findSaleByRef(invoiceId);
-  if(!invoiceId || !linkedSale) { alert("Valid Invoice ID or phone number dite hobe."); return; }
+  const invoiceRef = (document.getElementById("chlInvoiceId").value || "").trim();
+  const linkedSale = findSaleByRef(invoiceRef);
+  if(!invoiceRef || !linkedSale) { alert("Valid Invoice ID or phone number dite hobe."); return; }
   const id = editChallanId || makeDocId(DB.settings.challanPrefix || "CHL", DB.challans);
   const obj = {
     id: id,
-    invoiceId: invoiceId,
+    invoiceId: linkedSale.id,
     customerId: linkedSale.customerId || linkedSale.id,
     date: document.getElementById("chlDate").value || today(),
     customer: document.getElementById("chlCustomer").value,
@@ -1724,11 +1724,11 @@ function printChallanEntry(id) {
 }
 
 function saveReceipt() {
-  const invoiceId = (document.getElementById("rcInvoiceId").value || "").trim();
-  const linkedSale = findSaleByRef(invoiceId);
-  if(!invoiceId || !linkedSale) { alert("Valid Invoice ID or phone number dite hobe."); return; }
+  const invoiceRef = (document.getElementById("rcInvoiceId").value || "").trim();
+  const linkedSale = findSaleByRef(invoiceRef);
+  if(!invoiceRef || !linkedSale) { alert("Valid Invoice ID or phone number dite hobe."); return; }
   const id = editReceiptId || makeDocId(DB.settings.receiptPrefix || "MR", DB.receipts);
-  const obj = { id:id, invoiceId: invoiceId, customerId: linkedSale.customerId || linkedSale.id, date: document.getElementById("rcDate").value || today(), customer: document.getElementById("rcName").value, amount: Number(document.getElementById("rcAmount").value || 0), purpose: document.getElementById("rcPurpose").value, notes: document.getElementById("rcNotes").value };
+  const obj = { id:id, invoiceId: linkedSale.id, customerId: linkedSale.customerId || linkedSale.id, date: document.getElementById("rcDate").value || today(), customer: document.getElementById("rcName").value, amount: Number(document.getElementById("rcAmount").value || 0), purpose: document.getElementById("rcPurpose").value, notes: document.getElementById("rcNotes").value };
   if(editReceiptId) DB.receipts = DB.receipts.map(x => x.id===id ? obj : x); else DB.receipts.unshift(obj);
   editReceiptId = null; saveDB();
 }
