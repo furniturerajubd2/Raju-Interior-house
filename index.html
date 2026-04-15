@@ -18,7 +18,7 @@
 .menuLauncherHead{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .menuLauncherHead h2{margin:0;font-size:22px;color:#f4fbf6}
 .menuLauncherBadge{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:999px;background:rgba(31,143,78,.16);border:1px solid rgba(74,222,128,.16);color:#d8f5df;font-size:13px;font-weight:700}
-.menuLauncherGrid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:14px}
+.menuLauncherGrid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:14px}
 .menuCard{margin:0;padding:18px;border-radius:22px;text-align:left;background:rgba(8,20,14,.78);border:1px solid rgba(74,222,128,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.03);display:flex;flex-direction:column;align-items:flex-start;gap:12px;min-height:138px}
 .menuCard.active{border-color:rgba(74,222,128,.34);box-shadow:0 0 0 2px rgba(31,143,78,.16),0 20px 40px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.04)}
 .menuCardIcon{width:56px;height:56px;border-radius:18px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(74,222,128,.14),rgba(249,115,22,.10));border:1px solid rgba(74,222,128,.12);color:#ebfff1;font-size:24px;line-height:1}
@@ -40,18 +40,23 @@
 .span-5{grid-column:span 5} .span-7{grid-column:span 7} .span-12{grid-column:span 12}
 @media (max-width:980px){.span-5,.span-7,.span-12{grid-column:span 12}}
 h2,h3{margin:0 0 12px;color:var(--gold2)} label{display:block;margin:10px 0 6px;font-size:14px;color:#c8d8cf}
-input,textarea,button{width:100%;border-radius:12px;border:1px solid rgba(74,222,128,.12);background:rgba(255,255,255,.08);color:var(--text);padding:12px 14px;font-size:14px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+input,textarea,select,button{width:100%;border-radius:12px;border:1px solid rgba(74,222,128,.12);background:rgba(255,255,255,.08);color:var(--text);padding:12px 14px;font-size:14px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
 textarea{min-height:90px;resize:vertical} button{cursor:pointer;background:linear-gradient(135deg,#1f8f4e,#f97316);color:#fff;font-weight:700;border:none;margin-top:12px;box-shadow:0 12px 24px rgba(31,143,78,.18)}
 button.secondary{background:rgba(255,255,255,.08);color:var(--text);border:1px solid rgba(74,222,128,.12);box-shadow:none} button.danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff} button.small{width:auto;margin:0;padding:9px 12px;border-radius:10px;font-size:12px}
 .row{display:flex;gap:12px;flex-wrap:wrap} .row>*{flex:1;min-width:150px}
 .menuBtn{text-align:left;margin:8px 0;background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(74,222,128,.10)} .menuBtn.active{background:linear-gradient(135deg,#1f8f4e,#f97316);color:#fff}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px} @media (max-width:980px){.stats{grid-template-columns:1fr 1fr}}
+.dashboardStats{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media (max-width:980px){.dashboardStats{grid-template-columns:1fr 1fr}}
 .stat{background:rgba(255,255,255,.07);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow)} .stat .v{font-size:26px;font-weight:800;color:var(--gold2);margin-top:6px}
 .small{font-size:12px;color:var(--muted)} table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
 th,td{border-bottom:1px solid rgba(255,255,255,.08);padding:10px 8px;text-align:left;vertical-align:top} th{color:var(--gold2)}
 .section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px} .actions{display:flex;gap:8px;flex-wrap:wrap} .hide{display:none!important}
 .pill{display:inline-block;background:rgba(74,222,128,.10);color:var(--gold2);border:1px solid rgba(74,222,128,.14);padding:6px 10px;border-radius:999px;font-size:12px}
 .note{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted);font-size:12px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.cashTypeTag{display:inline-flex;align-items:center;justify-content:center;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.02em}
+.cashTypeIn{background:rgba(74,222,128,.14);border:1px solid rgba(74,222,128,.18);color:#d6f7df}
+.cashTypeOut{background:rgba(249,115,22,.14);border:1px solid rgba(249,115,22,.20);color:#ffd9bf}
 .modalBg{position:fixed;inset:0;background:rgba(2,6,23,.56);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
 .modal{width:min(860px,100%);max-height:90vh;overflow:auto;background:linear-gradient(180deg,var(--panel),var(--panel2));backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border:1px solid var(--border);border-radius:22px;padding:18px;box-shadow:0 24px 50px rgba(31,41,55,.18)}
 .kv{display:grid;grid-template-columns:180px 1fr;gap:10px;margin:8px 0} @media (max-width:760px){.kv{grid-template-columns:1fr}}
@@ -98,7 +103,6 @@ th,td{border-bottom:1px solid rgba(255,255,255,.08);padding:10px 8px;text-align:
 @media (max-width:620px){.menuLauncherHead{flex-direction:column;align-items:flex-start}.menuLauncherGrid{grid-template-columns:1fr}.menuCard{min-height:auto}}
 .green{color:#7edc81} .red{color:#ff9e9e}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -119,12 +123,6 @@ const DEFAULTS = {
   defaultPage: "invoice"
 };
 const KEY = "rih_manager_menu_v4";
-const SUPABASE_URL = "https://jvhotkfoerydonrzdbkt.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2aG90a2ZvZXJ5ZG9ucnpkYmt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMjEwMjgsImV4cCI6MjA5MTc5NzAyOH0.brPaQq87RiscMx462RvFpXQht8jbr3Ya1gnz453RflE";
-const CLOUD_BACKUP_KEY = "rih_manager_menu_v4_primary";
-const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-let cloudSyncStatus = supabaseClient ? "Cloud backup connecting..." : "Cloud backup unavailable";
-let cloudSyncTimer = null;
 
 function freshDB() {
   return {
@@ -133,7 +131,8 @@ function freshDB() {
     challans: [],
     receipts: [],
     expenses: [],
-    supplierProjects: []
+    supplierProjects: [],
+    personalCash: []
   };
 }
 function loadDB() {
@@ -150,11 +149,12 @@ DB.sales = Array.isArray(DB.sales) ? DB.sales : [];
 DB.receipts = Array.isArray(DB.receipts) ? DB.receipts : [];
 DB.expenses = Array.isArray(DB.expenses) ? DB.expenses : [];
 DB.supplierProjects = Array.isArray(DB.supplierProjects) ? DB.supplierProjects : [];
+DB.personalCash = Array.isArray(DB.personalCash) ? DB.personalCash : [];
 let currentPage = (DB.settings && DB.settings.defaultPage) || "invoice";
-let editSaleId = null, editChallanId = null, editReceiptId = null, editExpenseId = null, editSupplierId = null, editPaymentId = null;
+let editSaleId = null, editChallanId = null, editReceiptId = null, editExpenseId = null, editSupplierId = null, editPaymentId = null, editPersonalCashId = null;
 let headerMenuOpen = false;
-let recentVisibility = { invoice: true, challan: true, receipt: true, supplier: true, expense: true };
-let openRecentIds = { invoice: null, challan: null, receipt: null, supplier: null, expense: null };
+let recentVisibility = { invoice: true, challan: true, receipt: true, supplier: true, expense: true, personal: true };
+let openRecentIds = { invoice: null, challan: null, receipt: null, supplier: null, expense: null, personal: null };
 let dashboardTab = "customer";
 let openDashboardCustomerId = null;
 let openDashboardSupplierId = null;
@@ -164,77 +164,24 @@ let dashboardSupplierSearch = "";
 let dashboardExpenseSearch = "";
 let dashboardSupplierStatusFilter = "all";
 let dashboardExpenseStatusFilter = "all";
-let appUnlocked = !((DB.settings && DB.settings.appPassword) || "");
+let dashboardDateFrom = "";
+let dashboardDateTo = "";
 
-function setCloudSyncStatus(message, shouldRender) {
-  cloudSyncStatus = message;
-  if(shouldRender) render();
-}
-async function pushCloudBackup() {
-  if(!supabaseClient) return;
-  try {
-    setCloudSyncStatus("Cloud backup syncing...", currentPage === "settings");
-    const payload = JSON.parse(JSON.stringify(DB));
-    const { error } = await supabaseClient
-      .from("app_backups")
-      .upsert({
-        app_key: CLOUD_BACKUP_KEY,
-        payload: payload,
-        updated_at: new Date().toISOString()
-      }, { onConflict: "app_key" });
-    if(error) throw error;
-    setCloudSyncStatus("Cloud backup synced", currentPage === "settings");
-  } catch (error) {
-    console.error("Cloud backup failed", error);
-    setCloudSyncStatus("Cloud backup failed", currentPage === "settings");
-  }
-}
-function queueCloudBackup() {
-  if(!supabaseClient) return;
-  if(cloudSyncTimer) clearTimeout(cloudSyncTimer);
-  cloudSyncTimer = setTimeout(function() {
-    pushCloudBackup();
-  }, 600);
-}
-function normalizeLoadedDB(data) {
-  const next = data || freshDB();
-  next.settings = Object.assign({}, DEFAULTS, next.settings || {});
-  next.challans = Array.isArray(next.challans) ? next.challans : [];
-  next.sales = Array.isArray(next.sales) ? next.sales : [];
-  next.receipts = Array.isArray(next.receipts) ? next.receipts : [];
-  next.expenses = Array.isArray(next.expenses) ? next.expenses : [];
-  next.supplierProjects = Array.isArray(next.supplierProjects) ? next.supplierProjects : [];
-  return next;
-}
-async function restoreCloudBackup() {
-  if(!supabaseClient) return;
-  try {
-    setCloudSyncStatus("Checking cloud backup...", false);
-    const { data, error } = await supabaseClient
-      .from("app_backups")
-      .select("payload, updated_at")
-      .eq("app_key", CLOUD_BACKUP_KEY)
-      .maybeSingle();
-    if(error) throw error;
-    if(data && data.payload) {
-      DB = normalizeLoadedDB(data.payload);
-      localStorage.setItem(KEY, JSON.stringify(DB));
-      currentPage = (DB.settings && DB.settings.defaultPage) || "invoice";
-      setCloudSyncStatus("Cloud backup restored", false);
-      render();
-      return;
-    }
-    setCloudSyncStatus("No cloud backup yet", false);
-  } catch (error) {
-    console.error("Cloud restore failed", error);
-    setCloudSyncStatus("Cloud restore failed", false);
-  }
-}
-function saveDB() { localStorage.setItem(KEY, JSON.stringify(DB)); queueCloudBackup(); render(); }
+function saveDB() { localStorage.setItem(KEY, JSON.stringify(DB)); render(); }
 function esc(s) { return String(s || "").replace(/[&<>"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])); }
 function money(n) { return (DB.settings.currency || "৳") + Number(n || 0).toLocaleString(); }
 function today() { return new Date().toISOString().slice(0,10); }
 function monthKey(d) { const x = new Date(d || Date.now()); return x.getFullYear() + "-" + String(x.getMonth()+1).padStart(2,"0"); }
+function monthStartDate(d) {
+  const x = new Date(d || Date.now());
+  x.setDate(1);
+  return x.toISOString().slice(0,10);
+}
+function monthEndDate(d) {
+  const x = new Date(d || Date.now());
+  x.setMonth(x.getMonth() + 1, 0);
+  return x.toISOString().slice(0,10);
+}
 function uid(prefix) { return prefix + "-" + Math.random().toString(36).slice(2,8).toUpperCase(); }
 function makeDocId(prefix, list) {
   const stamp = today().replace(/-/g, "");
@@ -265,6 +212,9 @@ function linkedChallans(invoiceId) {
 function saleDiscountValue(s) {
   return Number((s || {}).discount || 0);
 }
+function saleNetTotal(s) {
+  return Math.max(0, Number((s || {}).total || 0) - saleDiscountValue(s));
+}
 function saleBasePaid(s) {
   return Number((s || {}).advance || (s || {}).paid || 0);
 }
@@ -277,16 +227,65 @@ function salePaidTotal(s) {
 function saleDueAmount(s) {
   return Math.max(0, Number((s || {}).total || 0) - saleDiscountValue(s) - salePaidTotal(s));
 }
+function normalizeDashboardDateRange() {
+  let from = dashboardDateFrom || "";
+  let to = dashboardDateTo || "";
+  if(from && to && from > to) {
+    const tmp = from;
+    from = to;
+    to = tmp;
+  }
+  return { from: from, to: to };
+}
+function dateMatchesRange(dateValue, start, end) {
+  const value = String(dateValue || "").slice(0,10);
+  if(!value) return false;
+  if(start && value < start) return false;
+  if(end && value > end) return false;
+  return true;
+}
+function dashboardDateMatches(dateValue) {
+  const range = normalizeDashboardDateRange();
+  return dateMatchesRange(dateValue, range.from, range.to);
+}
+function dashboardDateLabel() {
+  const range = normalizeDashboardDateRange();
+  if(!range.from && !range.to) return "All Dates";
+  return (range.from || "Start") + " to " + (range.to || "Now");
+}
+function resetDashboardOpenState() {
+  openDashboardCustomerId = null;
+  openDashboardSupplierId = null;
+  openDashboardExpenseId = null;
+}
+function setDashboardDate(field, value) {
+  if(field === "from") dashboardDateFrom = value || "";
+  else dashboardDateTo = value || "";
+  resetDashboardOpenState();
+  render();
+}
+function setDashboardDatePreset(preset) {
+  if(preset === "thisMonth") {
+    dashboardDateFrom = monthStartDate(today());
+    dashboardDateTo = monthEndDate(today());
+  } else {
+    dashboardDateFrom = "";
+    dashboardDateTo = "";
+  }
+  resetDashboardOpenState();
+  render();
+}
 function customerList() {
   return DB.sales.slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); }).map(function(s) {
     return {
       customerId: s.id,
       invoiceId: s.id,
+      date: s.date || "",
       customer: s.customer || "",
       phone: s.phone || "",
       address: s.address || "",
       status: s.orderStatus || "On Going",
-      total: Number(s.total || 0),
+      total: saleNetTotal(s),
       paid: salePaidTotal(s),
       due: saleDueAmount(s),
       receiptCount: linkedReceipts(s.id).length,
@@ -298,6 +297,7 @@ function dashboardCustomerItems(query) {
   const q = String(query || "").trim().toLowerCase();
   return customerList().filter(function(c) {
     if(dashboardStatusFilter !== "all" && c.status !== dashboardStatusFilter) return false;
+    if(!dashboardDateMatches(c.date)) return false;
     if(!q) return true;
     return String(c.customerId || "").toLowerCase().includes(q)
       || String(c.invoiceId || "").toLowerCase().includes(q)
@@ -414,6 +414,7 @@ function renderDashboardSupplierRows() {
   DB.supplierProjects.slice().sort(function(a,b){ return new Date(b.date) - new Date(a.date); }).forEach(function(x) {
     const status = x.orderStatus || "On Going";
     if(dashboardSupplierStatusFilter !== "all" && status !== dashboardSupplierStatusFilter) return;
+    if(!dashboardDateMatches(x.date)) return;
     const name = String(x.supplierName || "").trim() || "Supplier";
     const searchable = [name, x.project || "", x.id || ""].join(" ").toLowerCase();
     if(q && searchable.indexOf(q) === -1) return;
@@ -468,6 +469,7 @@ function renderDashboardExpenseRows() {
   const rows = DB.expenses.slice().sort(function(a,b){ return new Date(b.date) - new Date(a.date); }).filter(function(x){
     const status = x.orderStatus || "On Going";
     if(dashboardExpenseStatusFilter !== "all" && status !== dashboardExpenseStatusFilter) return false;
+    if(!dashboardDateMatches(x.date)) return false;
     if(!q) return true;
     return String(x.head || "").toLowerCase().includes(q)
       || String(x.id || "").toLowerCase().includes(q)
@@ -490,9 +492,7 @@ function renderDashboardExpenseRows() {
 }
 function setDashboardTab(tab) {
   dashboardTab = tab;
-  openDashboardCustomerId = null;
-  openDashboardSupplierId = null;
-  openDashboardExpenseId = null;
+  resetDashboardOpenState();
   render();
 }
 function setPage(p) { currentPage = p; headerMenuOpen = false; render(); }
@@ -566,16 +566,43 @@ function openModal(html) { document.getElementById("modal").innerHTML = html; do
 document.addEventListener("click", function(e) { if(e.target && e.target.id === "modalBg") closeModal(); });
 function supplierPaid(p) { return Number(p.advanceAmount || 0) + (p.payments || []).reduce((a,b)=>a+Number(b.amount||0),0); }
 function supplierDue(p) { return Number(p.totalAmount || 0) - supplierPaid(p); }
+function personalCashSummary() {
+  return DB.personalCash.reduce(function(sum, item) {
+    const amount = Number(item.amount || 0);
+    if(item.type === "cash_out") sum.totalOut += amount;
+    else sum.totalIn += amount;
+    return sum;
+  }, { totalIn: 0, totalOut: 0, balance: 0 });
+}
+function personalCashTypeLabel(type) {
+  return type === "cash_out" ? "Cash Out" : "Cash In";
+}
+function personalCashTypeBadge(type) {
+  return '<span class="cashTypeTag ' + (type === "cash_out" ? 'cashTypeOut' : 'cashTypeIn') + '">' + personalCashTypeLabel(type) + '</span>';
+}
+function personalCashSummaryWithBalance() {
+  const summary = personalCashSummary();
+  summary.balance = summary.totalIn - summary.totalOut;
+  return summary;
+}
 function totals() {
   const cur = monthKey(today());
+  const range = normalizeDashboardDateRange();
+  const filteredSales = DB.sales.filter(function(x) { return dateMatchesRange(x.date, range.from, range.to); });
+  const filteredExpenses = DB.expenses.filter(function(x) { return dateMatchesRange(x.date, range.from, range.to); });
+  const filteredSupplierExpense = DB.supplierProjects.reduce(function(sum, p) {
+    if(!dateMatchesRange(p.date, range.from, range.to)) return sum;
+    return sum + Number(p.totalAmount || 0);
+  }, 0);
   return {
-    totalSale: DB.sales.reduce((a,b)=>a+Number(b.total||0),0),
-    generalExpense: DB.expenses.reduce((a,b)=>a+Number(b.amount||0),0),
-    supplierExpense: DB.supplierProjects.reduce((a,p)=>a+supplierPaid(p),0),
+    totalSale: filteredSales.reduce((a,b)=>a+saleNetTotal(b),0),
+    currentMonthSale: DB.sales.filter(function(x){ return monthKey(x.date) === cur; }).reduce((a,b)=>a+saleNetTotal(b),0),
+    generalExpense: filteredExpenses.reduce((a,b)=>a+Number(b.amount||0),0),
+    supplierExpense: filteredSupplierExpense,
     monthlyProfit:
-      DB.sales.filter(x=>monthKey(x.date)===cur).reduce((a,x)=>a+(Number(x.total||0)-Number(x.cost||0)),0)
-      - DB.expenses.filter(x=>monthKey(x.date)===cur).reduce((a,b)=>a+Number(b.amount||0),0)
-      - DB.supplierProjects.reduce((sum,p)=>sum+(p.payments||[]).filter(k=>monthKey(k.date)===cur).reduce((a,b)=>a+Number(b.amount||0),0),0)
+      filteredSales.reduce((a,x)=>a+(saleNetTotal(x)-Number(x.cost||0)),0)
+      - filteredExpenses.reduce((a,b)=>a+Number(b.amount||0),0)
+      - filteredSupplierExpense
   };
 }
 function printHTML(title, body) {
@@ -590,7 +617,6 @@ function brandHead() {
 function resetAll() {
   if(confirm("This will clear all local data in this browser. Continue?")) {
     DB = freshDB(); localStorage.removeItem(KEY); saveDB();
-    appUnlocked = true;
   }
 }
 
@@ -1459,6 +1485,12 @@ function deleteExpense(id) {
     saveDB();
   }
 }
+function deletePersonalCash(id) {
+  if(confirm("Delete this personal cash entry?")) {
+    DB.personalCash = DB.personalCash.filter(function(x) { return x.id !== id; });
+    saveDB();
+  }
+}
 
 function saveChallan() {
   const items = collectChallanItems();
@@ -1687,7 +1719,7 @@ function printReceiptEntry(id) {
 function saveExpense() {
   const id = editExpenseId || uid("EXP");
   const old = editExpenseId ? DB.expenses.find(x=>x.id===id) : null;
-  const obj = { id:id, date: document.getElementById("expDate").value || today(), head: document.getElementById("expHead").value, personalName: (document.getElementById("expPersonalName").value || "").trim(), amount: Number(document.getElementById("expAmount").value || 0), notes: document.getElementById("expNotes").value, orderStatus: (old && old.orderStatus) || "On Going" };
+  const obj = { id:id, date: document.getElementById("expDate").value || today(), head: document.getElementById("expHead").value, amount: Number(document.getElementById("expAmount").value || 0), notes: document.getElementById("expNotes").value, orderStatus: (old && old.orderStatus) || "On Going" };
   if(editExpenseId) DB.expenses = DB.expenses.map(x => x.id===id ? obj : x); else DB.expenses.unshift(obj);
   editExpenseId = null; saveDB();
 }
@@ -1697,7 +1729,6 @@ function fillExpense(id) {
   setTimeout(function() {
     document.getElementById("expDate").value = e.date || today();
     document.getElementById("expHead").value = e.head || "";
-    document.getElementById("expPersonalName").value = e.personalName || "";
     document.getElementById("expAmount").value = e.amount || 0;
     document.getElementById("expNotes").value = e.notes || "";
   }, 50);
@@ -1705,14 +1736,71 @@ function fillExpense(id) {
 function openExpense(id) {
   const e = DB.expenses.find(x=>x.id===id); if(!e) return;
   let html = '<div class="section-title"><h2>Expense Entry</h2><div class="actions"><button class="secondary small" onclick="printExpenseEntry(\''+id+'\')">Print</button><button class="secondary small" onclick="closeModal()">Close</button></div></div>';
-  html += '<div class="kv"><strong>ID</strong><div>'+esc(e.id)+'</div></div><div class="kv"><strong>Date</strong><div>'+esc(e.date)+'</div></div><div class="kv"><strong>Head</strong><div>'+esc(e.head)+'</div></div><div class="kv"><strong>Personal Expense Name</strong><div>'+esc(e.personalName || "-")+'</div></div><div class="kv"><strong>Amount</strong><div>'+money(e.amount)+'</div></div><div class="kv"><strong>Notes</strong><div>'+esc(e.notes || "-")+'</div></div>';
+  html += '<div class="kv"><strong>ID</strong><div>'+esc(e.id)+'</div></div><div class="kv"><strong>Date</strong><div>'+esc(e.date)+'</div></div><div class="kv"><strong>Head</strong><div>'+esc(e.head)+'</div></div><div class="kv"><strong>Amount</strong><div>'+money(e.amount)+'</div></div><div class="kv"><strong>Notes</strong><div>'+esc(e.notes || "-")+'</div></div>';
   openModal(html);
 }
 function printExpenseEntry(id) {
   const e = DB.expenses.find(x=>x.id===id); if(!e) return;
   let body = brandHead();
-  body += '<h1>EXPENSE ENTRY</h1><p><strong>ID:</strong> '+esc(e.id)+'</p><p><strong>Date:</strong> '+esc(e.date)+'</p><p><strong>Head:</strong> '+esc(e.head)+'</p><p><strong>Personal Expense Name:</strong> '+esc(e.personalName || "-")+'</p><p><strong>Amount:</strong> '+money(e.amount)+'</p><p><strong>Notes:</strong> '+esc(e.notes || "-")+'</p>';
+  body += '<h1>EXPENSE ENTRY</h1><p><strong>ID:</strong> '+esc(e.id)+'</p><p><strong>Date:</strong> '+esc(e.date)+'</p><p><strong>Head:</strong> '+esc(e.head)+'</p><p><strong>Amount:</strong> '+money(e.amount)+'</p><p><strong>Notes:</strong> '+esc(e.notes || "-")+'</p>';
   printHTML("Expense", body);
+}
+function updatePersonalCashLabels() {
+  const type = ((document.getElementById("pcType") || {}).value || "cash_in");
+  const sourceLabel = document.getElementById("pcSourceLabel");
+  const purposeLabel = document.getElementById("pcPurposeLabel");
+  const sourceInput = document.getElementById("pcSource");
+  const purposeInput = document.getElementById("pcPurpose");
+  const typeHint = document.getElementById("pcTypeHint");
+  if(sourceLabel) sourceLabel.textContent = type === "cash_out" ? "Paid To / Expense Source" : "Received From / Source";
+  if(purposeLabel) purposeLabel.textContent = type === "cash_out" ? "Reason / Purpose" : "Cash In Details";
+  if(sourceInput) sourceInput.placeholder = type === "cash_out" ? "Kake dilen / kon khoroch e gelo" : "Kotha theke cash ashlo";
+  if(purposeInput) purposeInput.placeholder = type === "cash_out" ? "Example: Personal shopping / Family support" : "Example: Salary / Personal loan return";
+  if(typeHint) typeHint.innerHTML = type === "cash_out"
+    ? 'Ei page personal khoroch alada kore rakhbe. Main expense page er sathe mix hobe na.'
+    : 'Ei page personal cash in alada kore rakhbe. Main receipt page er sathe mix hobe na.';
+}
+function savePersonalCash() {
+  const id = editPersonalCashId || makeDocId("PC", DB.personalCash);
+  const obj = {
+    id: id,
+    date: document.getElementById("pcDate").value || today(),
+    type: document.getElementById("pcType").value || "cash_in",
+    amount: Number(document.getElementById("pcAmount").value || 0),
+    source: document.getElementById("pcSource").value || "",
+    purpose: document.getElementById("pcPurpose").value || "",
+    notes: document.getElementById("pcNotes").value || ""
+  };
+  if(obj.amount <= 0) { alert("Amount 0 er cheye boro hote hobe."); return; }
+  if(editPersonalCashId) DB.personalCash = DB.personalCash.map(function(x) { return x.id === id ? obj : x; });
+  else DB.personalCash.unshift(obj);
+  editPersonalCashId = null;
+  saveDB();
+}
+function fillPersonalCash(id) {
+  const item = DB.personalCash.find(function(x) { return x.id === id; }); if(!item) return;
+  editPersonalCashId = id; setPage("personal");
+  setTimeout(function() {
+    document.getElementById("pcDate").value = item.date || today();
+    document.getElementById("pcType").value = item.type || "cash_in";
+    document.getElementById("pcAmount").value = item.amount || 0;
+    document.getElementById("pcSource").value = item.source || "";
+    document.getElementById("pcPurpose").value = item.purpose || "";
+    document.getElementById("pcNotes").value = item.notes || "";
+    updatePersonalCashLabels();
+  }, 50);
+}
+function openPersonalCash(id) {
+  const item = DB.personalCash.find(function(x) { return x.id === id; }); if(!item) return;
+  let html = '<div class="section-title"><h2>Personal Cash Entry</h2><div class="actions"><button class="secondary small" onclick="closeModal()">Close</button></div></div>';
+  html += '<div class="kv"><strong>ID</strong><div>'+esc(item.id)+'</div></div>'
+    + '<div class="kv"><strong>Date</strong><div>'+esc(item.date || "-")+'</div></div>'
+    + '<div class="kv"><strong>Type</strong><div>'+personalCashTypeBadge(item.type)+'</div></div>'
+    + '<div class="kv"><strong>Amount</strong><div>'+money(item.amount)+'</div></div>'
+    + '<div class="kv"><strong>Source</strong><div>'+esc(item.source || "-")+'</div></div>'
+    + '<div class="kv"><strong>Purpose</strong><div>'+esc(item.purpose || "-")+'</div></div>'
+    + '<div class="kv"><strong>Notes</strong><div>'+esc(item.notes || "-")+'</div></div>';
+  openModal(html);
 }
 
 function saveSupplier() {
@@ -1903,38 +1991,6 @@ function saveSettings() {
   DB.settings.logo = document.getElementById("setLogo").value.trim() || DEFAULTS.logo;
   DB.settings.showLogo = document.getElementById("setShowLogo").checked;
   DB.settings.defaultPage = document.getElementById("setDefaultPage").value || "invoice";
-  const hasExistingPassword = !!(DB.settings.appPassword || "");
-  const currentPasswordInput = document.getElementById("setCurrentPassword");
-  const newPasswordInput = document.getElementById("setNewPassword");
-  const confirmPasswordInput = document.getElementById("setConfirmPassword");
-  const removePasswordInput = document.getElementById("setRemovePassword");
-  const currentPassword = currentPasswordInput ? currentPasswordInput.value : "";
-  const newPassword = newPasswordInput ? newPasswordInput.value : "";
-  const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : "";
-  const removePassword = !!(removePasswordInput && removePasswordInput.checked);
-  if(removePassword) {
-    if(hasExistingPassword && currentPassword !== DB.settings.appPassword) {
-      alert("Current password not correct");
-      return;
-    }
-    DB.settings.appPassword = "";
-    appUnlocked = true;
-  } else if(newPassword || confirmPassword) {
-    if(hasExistingPassword && currentPassword !== DB.settings.appPassword) {
-      alert("Current password not correct");
-      return;
-    }
-    if(newPassword.length < 4) {
-      alert("Password minimum 4 characters");
-      return;
-    }
-    if(newPassword !== confirmPassword) {
-      alert("New password and confirm password do not match");
-      return;
-    }
-    DB.settings.appPassword = newPassword;
-    appUnlocked = true;
-  }
   currentPage = DB.settings.defaultPage;
   saveDB();
   alert("Settings saved");
@@ -1947,10 +2003,16 @@ function importBackup(ev) {
   const file = ev.target.files[0]; if(!file) return;
   const fr = new FileReader();
   fr.onload = function() {
-    DB = normalizeLoadedDB(JSON.parse(fr.result));
+    DB = JSON.parse(fr.result);
+    DB.settings = Object.assign({}, DEFAULTS, DB.settings || {});
+    DB.challans = Array.isArray(DB.challans) ? DB.challans : [];
+    DB.sales = Array.isArray(DB.sales) ? DB.sales : [];
+    DB.receipts = Array.isArray(DB.receipts) ? DB.receipts : [];
+    DB.expenses = Array.isArray(DB.expenses) ? DB.expenses : [];
+    DB.supplierProjects = Array.isArray(DB.supplierProjects) ? DB.supplierProjects : [];
+    DB.personalCash = Array.isArray(DB.personalCash) ? DB.personalCash : [];
     localStorage.setItem(KEY, JSON.stringify(DB));
     currentPage = (DB.settings && DB.settings.defaultPage) || "invoice";
-    queueCloudBackup();
     render();
     alert("Backup imported");
   };
@@ -1959,21 +2021,7 @@ function importBackup(ev) {
 function logout() {
   headerMenuOpen = false;
   currentPage = "invoice";
-  appUnlocked = !((DB.settings && DB.settings.appPassword) || "");
   render();
-}
-function unlockApp() {
-  const input = document.getElementById("loginPassword");
-  const password = input ? input.value : "";
-  if(password === (DB.settings.appPassword || "")) {
-    appUnlocked = true;
-    render();
-    return;
-  }
-  alert("Password not correct");
-}
-function loginPage() {
-  return '<div class="wrap"><div class="login"><h2 style="margin-top:0">Enter Password</h2><p class="small" style="margin-bottom:14px">This app is locked. Password diye open korte hobe.</p><label>Password</label><input id="loginPassword" type="password" placeholder="Enter password" onkeydown="if(event.key===\'Enter\') unlockApp()"><div class="actions" style="margin-top:14px"><button onclick="unlockApp()">Unlock</button></div></div></div>';
 }
 
 function menuButton(key, label) {
@@ -1989,6 +2037,7 @@ function sidebarView() {
     + menuButton("receipt","Money Receipt")
     + menuButton("supplier","Supplier Hisab")
     + menuButton("expense","Expense")
+    + menuButton("personal","Personal Cash")
     + menuButton("dashboard","Dashboard")
     + menuButton("settings","Settings")
     + '<div class="note">Dashboard hide thakbe. Menu theke open korte parba.</div></div>';
@@ -2020,36 +2069,60 @@ function supplierPage() {
 function expensePage() {
   const recentVisible = isRecentVisible("expense");
   const recentCard = '<div class="card recentDock"><div class="recentDockHead"><div><h2 style="margin-bottom:4px">Recent Expense</h2><div class="small">'+DB.expenses.length+' entries</div></div><button class="secondary small" onclick="toggleRecentPanel(\'expense\')">'+(recentVisible ? 'Hide' : 'Show')+'</button></div>'+recentExpenseListView()+'</div>';
-  const formCard = '<div class="card invoiceMain"><div class="section-title"><h2>Expense</h2><div class="actions"><button class="secondary small" onclick="toggleRecentPanel(\'expense\')">'+(recentVisible ? 'Hide Recent' : 'Show Recent')+'</button></div></div><label>Date</label><input id="expDate" type="date" value="'+today()+'"><label>Expense Head</label><input id="expHead" placeholder="Transport / Rent / Salary / Tea"><label>Personal Expense Name</label><input id="expPersonalName" placeholder="Optional person or purpose name"><label>Amount</label><input id="expAmount" type="number" value="0"><label>Notes</label><textarea id="expNotes"></textarea><button onclick="saveExpense()">'+(editExpenseId?"Update Expense":"Save Expense")+'</button><div class="note">Supplier payment dashboard e expense hisebe count hocche.</div></div>';
+  const formCard = '<div class="card invoiceMain"><div class="section-title"><h2>Expense</h2><div class="actions"><button class="secondary small" onclick="toggleRecentPanel(\'expense\')">'+(recentVisible ? 'Hide Recent' : 'Show Recent')+'</button></div></div><label>Date</label><input id="expDate" type="date" value="'+today()+'"><label>Expense Head</label><input id="expHead" placeholder="Transport / Rent / Salary / Tea"><label>Amount</label><input id="expAmount" type="number" value="0"><label>Notes</label><textarea id="expNotes"></textarea><button onclick="saveExpense()">'+(editExpenseId?"Update Expense":"Save Expense")+'</button><div class="note">Supplier payment dashboard e expense hisebe count hocche.</div></div>';
+  return '<div class="invoiceShell '+(recentVisible ? '' : 'recentHidden')+'">' + formCard + (recentVisible ? recentCard : '') + '</div>';
+}
+function recentPersonalCashListView() {
+  const items = DB.personalCash.slice().sort(function(a,b){ return new Date(b.date) - new Date(a.date); }).slice(0, 12);
+  if(!items.length) return '<div class="note">No personal cash entry yet.</div>';
+  return '<div class="recentCompact">' + items.map(function(x, index) {
+    const open = openRecentIds.personal === x.id;
+    return '<div class="recentItem"><div class="recentSummary" onclick="toggleRecentItem(\'personal\', \''+x.id+'\')"><div class="recentSl">' + String(index + 1).padStart(2, "0") + '</div><div><div class="recentName">' + esc(x.source || "Personal Cash") + '</div><div class="small" style="margin-top:4px">' + personalCashTypeLabel(x.type) + ' · ' + money(x.amount) + '</div></div><div class="recentArrow">' + (open ? '&#9650;' : '&#9660;') + '</div></div>' + (open ? '<div class="recentMeta"><p><strong>ID:</strong> ' + esc(x.id) + '</p><p><strong>Date:</strong> ' + esc(x.date || "-") + '</p><p><strong>Type:</strong> ' + personalCashTypeLabel(x.type) + '</p><p><strong>Amount:</strong> ' + money(x.amount) + '</p><p><strong>Source:</strong> ' + esc(x.source || "-") + '</p><p><strong>Purpose:</strong> ' + esc(x.purpose || "-") + '</p><div class="actions"><button class="secondary small" onclick="event.stopPropagation();openPersonalCash(\''+x.id+'\')">Open</button><button class="secondary small" onclick="event.stopPropagation();fillPersonalCash(\''+x.id+'\')">Edit</button><button class="danger small" onclick="event.stopPropagation();deletePersonalCash(\''+x.id+'\')">Delete</button></div></div>' : '') + '</div>';
+  }).join('') + '</div>';
+}
+function personalCashPage() {
+  const recentVisible = isRecentVisible("personal");
+  const summary = personalCashSummaryWithBalance();
+  const recentCard = '<div class="card recentDock"><div class="recentDockHead"><div><h2 style="margin-bottom:4px">Recent Personal Cash</h2><div class="small">'+DB.personalCash.length+' entries</div></div><button class="secondary small" onclick="toggleRecentPanel(\'personal\')">'+(recentVisible ? 'Hide' : 'Show')+'</button></div>'+recentPersonalCashListView()+'</div>';
+  const formCard = '<div class="card invoiceMain"><div class="section-title"><h2>Personal Cash In / Cash Out</h2><div class="actions"><span class="pill">Separate From Main Accounts</span><button class="secondary small" onclick="toggleRecentPanel(\'personal\')">'+(recentVisible ? 'Hide Recent' : 'Show Recent')+'</button></div></div><div class="stats" style="margin-bottom:14px"><div class="stat"><div class="small">Total Cash In</div><div class="v">'+money(summary.totalIn)+'</div></div><div class="stat"><div class="small">Total Cash Out</div><div class="v">'+money(summary.totalOut)+'</div></div><div class="stat"><div class="small">Available Balance</div><div class="v">'+money(summary.balance)+'</div></div><div class="stat"><div class="small">Entry Count</div><div class="v">'+esc(DB.personalCash.length)+'</div></div></div><label>Date</label><input id="pcDate" type="date" value="'+today()+'"><div class="row"><div><label>Type</label><select id="pcType" onchange="updatePersonalCashLabels()"><option value="cash_in">Cash In</option><option value="cash_out">Cash Out</option></select></div><div><label>Amount</label><input id="pcAmount" type="number" value="0" placeholder="Amount"></div></div><label id="pcSourceLabel">Received From / Source</label><input id="pcSource" placeholder="Kotha theke cash ashlo"><label id="pcPurposeLabel">Cash In Details</label><input id="pcPurpose" placeholder="Example: Salary / Personal loan return"><label>Notes</label><textarea id="pcNotes"></textarea><button onclick="savePersonalCash()">'+(editPersonalCashId?"Update Entry":"Save Entry")+'</button><div id="pcTypeHint" class="note">Ei page personal cash in alada kore rakhbe. Main receipt page er sathe mix hobe na.</div></div>';
   return '<div class="invoiceShell '+(recentVisible ? '' : 'recentHidden')+'">' + formCard + (recentVisible ? recentCard : '') + '</div>';
 }
 function dashboardPage() {
   const t = totals();
+  const activeDateLabel = dashboardDateLabel();
   let listTitle = "Customer List";
-  let listBadge = customerList().length + " customers";
+  let listBadge = dashboardCustomerItems("").length + " customers";
   let listBody = '<label>Search Customer</label><input id="customerSearch" placeholder="Invoice ID or phone number diye search korun" oninput="filterCustomerList(this.value)"><div class="section-title" style="margin-top:12px"><h3 style="margin:0">Order Status</h3><span class="small">Customer list filter</span></div><div class="statusFilters"><button class="secondary small '+(dashboardStatusFilter==="On Going"?"active":"")+'" onclick="setDashboardStatusFilter(\'On Going\')">On Going</button><button class="secondary small '+(dashboardStatusFilter==="Complete"?"active":"")+'" onclick="setDashboardStatusFilter(\'Complete\')">Complete</button><button class="secondary small '+(dashboardStatusFilter==="all"?"active":"")+'" onclick="setDashboardStatusFilter(\'all\')">All</button></div><div class="dashListHead"><div>SL No</div><div>Name</div><div>Number</div><div>Due Amount</div><div>Action</div></div><div id="customerListBody" class="dashList">'+renderCustomerRows("")+'</div>';
   if(dashboardTab === "supplier") {
     listTitle = "Supplier List";
-    listBadge = DB.supplierProjects.length + " entries";
+    listBadge = DB.supplierProjects.filter(function(x) {
+      const status = x.orderStatus || "On Going";
+      if(dashboardSupplierStatusFilter !== "all" && status !== dashboardSupplierStatusFilter) return false;
+      return dashboardDateMatches(x.date);
+    }).length + " entries";
     listBody = '<label>Search Supplier</label><input value="'+esc(dashboardSupplierSearch)+'" placeholder="Supplier name, project or ID diye search korun" oninput="setDashboardSupplierSearch(this.value)"><div class="section-title" style="margin-top:12px"><h3 style="margin:0">Order Status</h3><span class="small">Supplier list filter</span></div><div class="statusFilters"><button class="secondary small '+(dashboardSupplierStatusFilter==="On Going"?"active":"")+'" onclick="setDashboardSupplierStatusFilter(\'On Going\')">On Going</button><button class="secondary small '+(dashboardSupplierStatusFilter==="Complete"?"active":"")+'" onclick="setDashboardSupplierStatusFilter(\'Complete\')">Complete</button><button class="secondary small '+(dashboardSupplierStatusFilter==="all"?"active":"")+'" onclick="setDashboardSupplierStatusFilter(\'all\')">All</button></div><div class="dashListHead"><div>SL No</div><div>Supplier</div><div>Project</div><div>Due Amount</div><div>Action</div></div><div class="dashList">'+renderDashboardSupplierRows()+'</div>';
   } else if(dashboardTab === "expense") {
     listTitle = "Expense List";
-    listBadge = DB.expenses.length + " entries";
+    listBadge = DB.expenses.filter(function(x) {
+      const status = x.orderStatus || "On Going";
+      if(dashboardExpenseStatusFilter !== "all" && status !== dashboardExpenseStatusFilter) return false;
+      return dashboardDateMatches(x.date);
+    }).length + " entries";
     listBody = '<label>Search Expense</label><input value="'+esc(dashboardExpenseSearch)+'" placeholder="Expense head, date or ID diye search korun" oninput="setDashboardExpenseSearch(this.value)"><div class="section-title" style="margin-top:12px"><h3 style="margin:0">Order Status</h3><span class="small">Expense list filter</span></div><div class="statusFilters"><button class="secondary small '+(dashboardExpenseStatusFilter==="On Going"?"active":"")+'" onclick="setDashboardExpenseStatusFilter(\'On Going\')">On Going</button><button class="secondary small '+(dashboardExpenseStatusFilter==="Complete"?"active":"")+'" onclick="setDashboardExpenseStatusFilter(\'Complete\')">Complete</button><button class="secondary small '+(dashboardExpenseStatusFilter==="all"?"active":"")+'" onclick="setDashboardExpenseStatusFilter(\'all\')">All</button></div><div class="dashListHead"><div>SL No</div><div>Date</div><div>Head</div><div>Amount</div><div>Action</div></div><div class="dashList">'+renderDashboardExpenseRows()+'</div>';
   }
-  return '<div class="grid"><div class="card span-12"><div class="section-title"><h2>Dashboard</h2><span class="pill">Hidden Menu Page</span></div><div class="stats"><div class="stat"><div class="small">Total Sale</div><div class="v">'+money(t.totalSale)+'</div></div><div class="stat"><div class="small">General Expense</div><div class="v">'+money(t.generalExpense)+'</div></div><div class="stat"><div class="small">Supplier Expense</div><div class="v">'+money(t.supplierExpense)+'</div></div><div class="stat"><div class="small">Monthly Profit</div><div class="v">'+money(t.monthlyProfit)+'</div></div></div></div><div class="card span-12"><div class="section-title"><div class="actions"><h2 style="margin:0">'+listTitle+'</h2><button class="secondary small '+(dashboardTab==="customer"?"active":"")+'" onclick="setDashboardTab(\'customer\')">Customer List</button><button class="secondary small '+(dashboardTab==="supplier"?"active":"")+'" onclick="setDashboardTab(\'supplier\')">Supplier List</button><button class="secondary small '+(dashboardTab==="expense"?"active":"")+'" onclick="setDashboardTab(\'expense\')">Expense List</button></div><span class="pill">'+listBadge+'</span></div>'+listBody+'</div></div>';
+  return '<div class="grid"><div class="card span-12"><div class="section-title"><h2>Dashboard</h2><span class="pill">'+esc(activeDateLabel)+'</span></div><div class="row"><div><label>Date From</label><input type="date" value="'+esc(dashboardDateFrom)+'" onchange="setDashboardDate(\'from\', this.value)"></div><div><label>Date To</label><input type="date" value="'+esc(dashboardDateTo)+'" onchange="setDashboardDate(\'to\', this.value)"></div></div><div class="actions" style="margin-top:12px"><button class="secondary small" onclick="setDashboardDatePreset(\'thisMonth\')">This Month</button><button class="secondary small" onclick="setDashboardDatePreset(\'all\')">All Dates</button></div><div class="note">Date filter dashboard summary ar list duitar upor kaj korbe.</div></div><div class="card span-12"><div class="section-title"><h2>Sales & Summary</h2><span class="pill">'+esc(activeDateLabel)+'</span></div><div class="stats dashboardStats"><div class="stat"><div class="small">This Month Sale</div><div class="v">'+money(t.currentMonthSale)+'</div></div><div class="stat"><div class="small">Filtered Sale</div><div class="v">'+money(t.totalSale)+'</div></div><div class="stat"><div class="small">General Expense</div><div class="v">'+money(t.generalExpense)+'</div></div><div class="stat"><div class="small">Supplier Expense</div><div class="v">'+money(t.supplierExpense)+'</div></div><div class="stat"><div class="small">Filtered Profit</div><div class="v">'+money(t.monthlyProfit)+'</div></div></div></div><div class="card span-12"><div class="section-title"><div class="actions"><h2 style="margin:0">'+listTitle+'</h2><button class="secondary small '+(dashboardTab==="customer"?"active":"")+'" onclick="setDashboardTab(\'customer\')">Customer List</button><button class="secondary small '+(dashboardTab==="supplier"?"active":"")+'" onclick="setDashboardTab(\'supplier\')">Supplier List</button><button class="secondary small '+(dashboardTab==="expense"?"active":"")+'" onclick="setDashboardTab(\'expense\')">Expense List</button></div><span class="pill">'+listBadge+'</span></div>'+listBody+'</div></div>';
 }
 function settingsPage() {
-  return '<div class="card"><h2>Settings</h2><div class="small" style="margin:-4px 0 14px;color:var(--gold2)">Cloud Backup: '+esc(cloudSyncStatus)+'</div><div class="row"><div><label>Business Name</label><input id="setName" value="'+esc(DB.settings.name)+'"></div><div><label>Phone</label><input id="setPhone" value="'+esc(DB.settings.phone)+'"></div></div><label>Address</label><input id="setAddress" value="'+esc(DB.settings.address)+'"><div class="row"><div><label>Currency</label><input id="setCurrency" value="'+esc(DB.settings.currency || "৳")+'"></div><div><label>Logo URL</label><input id="setLogo" placeholder="Optional online logo url"></div></div><div class="row"><div><label>Invoice Prefix</label><input id="setInvoicePrefix" value="'+esc(DB.settings.invoicePrefix || "INV")+'"></div><div><label>Challan Prefix</label><input id="setChallanPrefix" value="'+esc(DB.settings.challanPrefix || "CHL")+'"></div><div><label>Receipt Prefix</label><input id="setReceiptPrefix" value="'+esc(DB.settings.receiptPrefix || "MR")+'"></div><div><label>Supplier Prefix</label><input id="setSupplierPrefix" value="'+esc(DB.settings.supplierPrefix || "SUP")+'"></div></div><label>Default Open Page</label><input id="setDefaultPage" value="'+esc(DB.settings.defaultPage || "invoice")+'" placeholder="invoice / challan / receipt / supplier / expense / dashboard / settings"><label><input id="setShowLogo" type="checkbox" style="width:auto;margin-right:8px" '+(DB.settings.showLogo?'checked':'')+'> Show Logo in Print</label><div style="margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:16px"><h3 style="margin:0 0 10px">App Password</h3><div class="small" style="margin-bottom:10px">'+(DB.settings.appPassword ? 'Password already set. Change or remove korte current password lagbe.' : 'Password set korle app open korar age lock screen ashbe.')+'</div>'+(DB.settings.appPassword ? '<label>Current Password</label><input id="setCurrentPassword" type="password" placeholder="Current password">' : '')+'<div class="row"><div><label>New Password</label><input id="setNewPassword" type="password" placeholder="Minimum 4 characters"></div><div><label>Confirm Password</label><input id="setConfirmPassword" type="password" placeholder="Retype password"></div></div>'+(DB.settings.appPassword ? '<label><input id="setRemovePassword" type="checkbox" style="width:auto;margin-right:8px"> Remove password lock</label>' : '')+'</div><div class="actions"><button onclick="saveSettings()">Save Settings</button><button class="secondary small" onclick="pushCloudBackup()">Sync Now</button><button class="secondary small" onclick="exportBackup()">Backup Export</button><button class="secondary small" onclick="document.getElementById(\'backupFile2\').click()">Import</button><input id="backupFile2" type="file" accept=".json" class="hide" onchange="importBackup(event)"><button class="danger small" onclick="resetAll()">Reset App</button></div></div>';
+  return '<div class="card"><h2>Settings</h2><div class="row"><div><label>Business Name</label><input id="setName" value="'+esc(DB.settings.name)+'"></div><div><label>Phone</label><input id="setPhone" value="'+esc(DB.settings.phone)+'"></div></div><label>Address</label><input id="setAddress" value="'+esc(DB.settings.address)+'"><div class="row"><div><label>Currency</label><input id="setCurrency" value="'+esc(DB.settings.currency || "৳")+'"></div><div><label>Logo URL</label><input id="setLogo" placeholder="Optional online logo url"></div></div><div class="row"><div><label>Invoice Prefix</label><input id="setInvoicePrefix" value="'+esc(DB.settings.invoicePrefix || "INV")+'"></div><div><label>Challan Prefix</label><input id="setChallanPrefix" value="'+esc(DB.settings.challanPrefix || "CHL")+'"></div><div><label>Receipt Prefix</label><input id="setReceiptPrefix" value="'+esc(DB.settings.receiptPrefix || "MR")+'"></div><div><label>Supplier Prefix</label><input id="setSupplierPrefix" value="'+esc(DB.settings.supplierPrefix || "SUP")+'"></div></div><label>Default Open Page</label><input id="setDefaultPage" value="'+esc(DB.settings.defaultPage || "invoice")+'" placeholder="invoice / challan / receipt / supplier / expense / personal / dashboard / settings"><label><input id="setShowLogo" type="checkbox" style="width:auto;margin-right:8px" '+(DB.settings.showLogo?'checked':'')+'> Show Logo in Print</label><div class="actions"><button onclick="saveSettings()">Save Settings</button><button class="secondary small" onclick="exportBackup()">Backup Export</button><button class="secondary small" onclick="document.getElementById(\'backupFile2\').click()">Import</button><input id="backupFile2" type="file" accept=".json" class="hide" onchange="importBackup(event)"><button class="danger small" onclick="resetAll()">Reset App</button></div></div>';
 }
 function mainView() {
-  if((DB.settings.appPassword || "") && !appUnlocked) return loginPage();
   let content = '';
   if(currentPage === "invoice") content = invoicePage();
   else if(currentPage === "challan") content = challanPage();
   else if(currentPage === "receipt") content = receiptPage();
   else if(currentPage === "supplier") content = supplierPage();
   else if(currentPage === "expense") content = expensePage();
+  else if(currentPage === "personal") content = personalCashPage();
   else if(currentPage === "dashboard") content = dashboardPage();
   else content = settingsPage();
 
@@ -2060,14 +2133,17 @@ function mainView() {
     + launcherCard("receipt","Receipts","&#129534;",DB.receipts.length+' receipt entries',"Money receipt and payment log")
     + launcherCard("supplier","Supplier","&#128736;",DB.supplierProjects.length+' supplier projects',"Supplier account and dues")
     + launcherCard("expense","Expenses","&#128184;",DB.expenses.length+' expense entries',"Daily expense records")
+    + launcherCard("personal","Personal Cash","&#128181;",DB.personalCash.length+' personal entries',"Cash in, cash out and balance")
     + launcherCard("settings","Settings","&#9881;","Business info","Prefixes, logo and defaults")
     + '</div></div></div>';
 
-  return '<div class="topbar"><div class="headerLeft"><div class="menuWrap"><button class="menuToggle" onclick="toggleHeaderMenu()"><span></span><span></span><span></span></button>'+(headerMenuOpen ? '<div class="headerMenu">'+menuButton("invoice","Invoice")+menuButton("challan","Challan")+menuButton("receipt","Money Receipt")+menuButton("supplier","Supplier Hisab")+menuButton("expense","Expense")+menuButton("dashboard","Dashboard")+menuButton("settings","Settings")+'<button class="menuBtn danger" onclick="logout()">Logout</button></div>' : '')+'</div><div class="brand"><img src="'+(DB.settings.logo || DEFAULTS.logo)+'" alt="logo"><div><h1>'+esc(DB.settings.name)+'</h1><p>'+esc(DB.settings.phone)+' · '+esc(DB.settings.address)+'</p></div></div></div><div class="headerActions"><button class="secondary small" onclick="setPage(\'invoice\')">Main Invoice</button></div></div>'+launcher+'<div class="wrap"><div class="content">'+content+'</div></div>';
+  return '<div class="topbar"><div class="headerLeft"><div class="menuWrap"><button class="menuToggle" onclick="toggleHeaderMenu()"><span></span><span></span><span></span></button>'+(headerMenuOpen ? '<div class="headerMenu">'+menuButton("invoice","Invoice")+menuButton("challan","Challan")+menuButton("receipt","Money Receipt")+menuButton("supplier","Supplier Hisab")+menuButton("expense","Expense")+menuButton("personal","Personal Cash")+menuButton("dashboard","Dashboard")+menuButton("settings","Settings")+'<button class="menuBtn danger" onclick="logout()">Logout</button></div>' : '')+'</div><div class="brand"><img src="'+(DB.settings.logo || DEFAULTS.logo)+'" alt="logo"><div><h1>'+esc(DB.settings.name)+'</h1><p>'+esc(DB.settings.phone)+' · '+esc(DB.settings.address)+'</p></div></div></div><div class="headerActions"><button class="secondary small" onclick="setPage(\'invoice\')">Main Invoice</button></div></div>'+launcher+'<div class="wrap"><div class="content">'+content+'</div></div>';
 }
-function render() { document.getElementById("app").innerHTML = mainView(); }
+function render() {
+  document.getElementById("app").innerHTML = mainView();
+  if(currentPage === "personal") updatePersonalCashLabels();
+}
 render();
-restoreCloudBackup();
 </script>
 </body>
 </html>
