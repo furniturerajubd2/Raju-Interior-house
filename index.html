@@ -98,6 +98,7 @@ th,td{border-bottom:1px solid rgba(255,255,255,.08);padding:10px 8px;text-align:
 @media (max-width:620px){.menuLauncherHead{flex-direction:column;align-items:flex-start}.menuLauncherGrid{grid-template-columns:1fr}.menuCard{min-height:auto}}
 .green{color:#7edc81} .red{color:#ff9e9e}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -118,6 +119,12 @@ const DEFAULTS = {
   defaultPage: "invoice"
 };
 const KEY = "rih_manager_menu_v4";
+const SUPABASE_URL = "https://jvhotkfoerydonrzdbkt.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2aG90a2ZvZXJ5ZG9ucnpkYmt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMjEwMjgsImV4cCI6MjA5MTc5NzAyOH0.brPaQq87RiscMx462RvFpXQht8jbr3Ya1gnz453RflE";
+const CLOUD_BACKUP_KEY = "rih_manager_menu_v4_primary";
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let cloudSyncStatus = supabaseClient ? "Cloud backup connecting..." : "Cloud backup unavailable";
+let cloudSyncTimer = null;
 
 function freshDB() {
   return {
@@ -158,7 +165,71 @@ let dashboardExpenseSearch = "";
 let dashboardSupplierStatusFilter = "all";
 let dashboardExpenseStatusFilter = "all";
 
-function saveDB() { localStorage.setItem(KEY, JSON.stringify(DB)); render(); }
+function setCloudSyncStatus(message, shouldRender) {
+  cloudSyncStatus = message;
+  if(shouldRender) render();
+}
+async function pushCloudBackup() {
+  if(!supabaseClient) return;
+  try {
+    setCloudSyncStatus("Cloud backup syncing...", currentPage === "settings");
+    const payload = JSON.parse(JSON.stringify(DB));
+    const { error } = await supabaseClient
+      .from("app_backups")
+      .upsert({
+        app_key: CLOUD_BACKUP_KEY,
+        payload: payload,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "app_key" });
+    if(error) throw error;
+    setCloudSyncStatus("Cloud backup synced", currentPage === "settings");
+  } catch (error) {
+    console.error("Cloud backup failed", error);
+    setCloudSyncStatus("Cloud backup failed", currentPage === "settings");
+  }
+}
+function queueCloudBackup() {
+  if(!supabaseClient) return;
+  if(cloudSyncTimer) clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(function() {
+    pushCloudBackup();
+  }, 600);
+}
+function normalizeLoadedDB(data) {
+  const next = data || freshDB();
+  next.settings = Object.assign({}, DEFAULTS, next.settings || {});
+  next.challans = Array.isArray(next.challans) ? next.challans : [];
+  next.sales = Array.isArray(next.sales) ? next.sales : [];
+  next.receipts = Array.isArray(next.receipts) ? next.receipts : [];
+  next.expenses = Array.isArray(next.expenses) ? next.expenses : [];
+  next.supplierProjects = Array.isArray(next.supplierProjects) ? next.supplierProjects : [];
+  return next;
+}
+async function restoreCloudBackup() {
+  if(!supabaseClient) return;
+  try {
+    setCloudSyncStatus("Checking cloud backup...", false);
+    const { data, error } = await supabaseClient
+      .from("app_backups")
+      .select("payload, updated_at")
+      .eq("app_key", CLOUD_BACKUP_KEY)
+      .maybeSingle();
+    if(error) throw error;
+    if(data && data.payload) {
+      DB = normalizeLoadedDB(data.payload);
+      localStorage.setItem(KEY, JSON.stringify(DB));
+      currentPage = (DB.settings && DB.settings.defaultPage) || "invoice";
+      setCloudSyncStatus("Cloud backup restored", false);
+      render();
+      return;
+    }
+    setCloudSyncStatus("No cloud backup yet", false);
+  } catch (error) {
+    console.error("Cloud restore failed", error);
+    setCloudSyncStatus("Cloud restore failed", false);
+  }
+}
+function saveDB() { localStorage.setItem(KEY, JSON.stringify(DB)); queueCloudBackup(); render(); }
 function esc(s) { return String(s || "").replace(/[&<>"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])); }
 function money(n) { return (DB.settings.currency || "৳") + Number(n || 0).toLocaleString(); }
 function today() { return new Date().toISOString().slice(0,10); }
@@ -1841,9 +1912,10 @@ function importBackup(ev) {
   const file = ev.target.files[0]; if(!file) return;
   const fr = new FileReader();
   fr.onload = function() {
-    DB = JSON.parse(fr.result);
+    DB = normalizeLoadedDB(JSON.parse(fr.result));
     localStorage.setItem(KEY, JSON.stringify(DB));
     currentPage = (DB.settings && DB.settings.defaultPage) || "invoice";
+    queueCloudBackup();
     render();
     alert("Backup imported");
   };
@@ -1919,7 +1991,7 @@ function dashboardPage() {
   return '<div class="grid"><div class="card span-12"><div class="section-title"><h2>Dashboard</h2><span class="pill">Hidden Menu Page</span></div><div class="stats"><div class="stat"><div class="small">Total Sale</div><div class="v">'+money(t.totalSale)+'</div></div><div class="stat"><div class="small">General Expense</div><div class="v">'+money(t.generalExpense)+'</div></div><div class="stat"><div class="small">Supplier Expense</div><div class="v">'+money(t.supplierExpense)+'</div></div><div class="stat"><div class="small">Monthly Profit</div><div class="v">'+money(t.monthlyProfit)+'</div></div></div></div><div class="card span-12"><div class="section-title"><div class="actions"><h2 style="margin:0">'+listTitle+'</h2><button class="secondary small '+(dashboardTab==="customer"?"active":"")+'" onclick="setDashboardTab(\'customer\')">Customer List</button><button class="secondary small '+(dashboardTab==="supplier"?"active":"")+'" onclick="setDashboardTab(\'supplier\')">Supplier List</button><button class="secondary small '+(dashboardTab==="expense"?"active":"")+'" onclick="setDashboardTab(\'expense\')">Expense List</button></div><span class="pill">'+listBadge+'</span></div>'+listBody+'</div></div>';
 }
 function settingsPage() {
-  return '<div class="card"><h2>Settings</h2><div class="row"><div><label>Business Name</label><input id="setName" value="'+esc(DB.settings.name)+'"></div><div><label>Phone</label><input id="setPhone" value="'+esc(DB.settings.phone)+'"></div></div><label>Address</label><input id="setAddress" value="'+esc(DB.settings.address)+'"><div class="row"><div><label>Currency</label><input id="setCurrency" value="'+esc(DB.settings.currency || "৳")+'"></div><div><label>Logo URL</label><input id="setLogo" placeholder="Optional online logo url"></div></div><div class="row"><div><label>Invoice Prefix</label><input id="setInvoicePrefix" value="'+esc(DB.settings.invoicePrefix || "INV")+'"></div><div><label>Challan Prefix</label><input id="setChallanPrefix" value="'+esc(DB.settings.challanPrefix || "CHL")+'"></div><div><label>Receipt Prefix</label><input id="setReceiptPrefix" value="'+esc(DB.settings.receiptPrefix || "MR")+'"></div><div><label>Supplier Prefix</label><input id="setSupplierPrefix" value="'+esc(DB.settings.supplierPrefix || "SUP")+'"></div></div><label>Default Open Page</label><input id="setDefaultPage" value="'+esc(DB.settings.defaultPage || "invoice")+'" placeholder="invoice / challan / receipt / supplier / expense / dashboard / settings"><label><input id="setShowLogo" type="checkbox" style="width:auto;margin-right:8px" '+(DB.settings.showLogo?'checked':'')+'> Show Logo in Print</label><div class="actions"><button onclick="saveSettings()">Save Settings</button><button class="secondary small" onclick="exportBackup()">Backup Export</button><button class="secondary small" onclick="document.getElementById(\'backupFile2\').click()">Import</button><input id="backupFile2" type="file" accept=".json" class="hide" onchange="importBackup(event)"><button class="danger small" onclick="resetAll()">Reset App</button></div></div>';
+  return '<div class="card"><h2>Settings</h2><div class="small" style="margin:-4px 0 14px;color:var(--gold2)">Cloud Backup: '+esc(cloudSyncStatus)+'</div><div class="row"><div><label>Business Name</label><input id="setName" value="'+esc(DB.settings.name)+'"></div><div><label>Phone</label><input id="setPhone" value="'+esc(DB.settings.phone)+'"></div></div><label>Address</label><input id="setAddress" value="'+esc(DB.settings.address)+'"><div class="row"><div><label>Currency</label><input id="setCurrency" value="'+esc(DB.settings.currency || "৳")+'"></div><div><label>Logo URL</label><input id="setLogo" placeholder="Optional online logo url"></div></div><div class="row"><div><label>Invoice Prefix</label><input id="setInvoicePrefix" value="'+esc(DB.settings.invoicePrefix || "INV")+'"></div><div><label>Challan Prefix</label><input id="setChallanPrefix" value="'+esc(DB.settings.challanPrefix || "CHL")+'"></div><div><label>Receipt Prefix</label><input id="setReceiptPrefix" value="'+esc(DB.settings.receiptPrefix || "MR")+'"></div><div><label>Supplier Prefix</label><input id="setSupplierPrefix" value="'+esc(DB.settings.supplierPrefix || "SUP")+'"></div></div><label>Default Open Page</label><input id="setDefaultPage" value="'+esc(DB.settings.defaultPage || "invoice")+'" placeholder="invoice / challan / receipt / supplier / expense / dashboard / settings"><label><input id="setShowLogo" type="checkbox" style="width:auto;margin-right:8px" '+(DB.settings.showLogo?'checked':'')+'> Show Logo in Print</label><div class="actions"><button onclick="saveSettings()">Save Settings</button><button class="secondary small" onclick="pushCloudBackup()">Sync Now</button><button class="secondary small" onclick="exportBackup()">Backup Export</button><button class="secondary small" onclick="document.getElementById(\'backupFile2\').click()">Import</button><input id="backupFile2" type="file" accept=".json" class="hide" onchange="importBackup(event)"><button class="danger small" onclick="resetAll()">Reset App</button></div></div>';
 }
 function mainView() {
   let content = '';
@@ -1945,6 +2017,7 @@ function mainView() {
 }
 function render() { document.getElementById("app").innerHTML = mainView(); }
 render();
+restoreCloudBackup();
 </script>
 </body>
 </html>
